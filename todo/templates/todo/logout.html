@@ -1,0 +1,11 @@
+{% extends 'todo/index.html' %}
+
+{% block content %}
+
+    <h2>You Have Been Logged Out!</h2>
+    <div class="border-top pt-3">
+        <a href="{% url 'login' %}" class="ml-1"><button class="btn-sm btn-primary">Login Again</button></a>      
+    </div>
+
+
+{% endblock %}

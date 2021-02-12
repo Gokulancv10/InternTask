@@ -1,0 +1,39 @@
+{% extends 'todo/index.html' %}
+
+{% block content %}
+
+	<body>
+		<style type="text/css">
+			.h3{
+				text-align: center;
+			}
+
+			.card-body{
+				background-color: #eb7ef7;
+			}
+
+			.container{
+				margin-top: 10%;
+			}
+
+
+		</style>
+
+
+		<div class="container">
+			<div class="card card-body">
+				<h3 class='h3'>Update Tasks</h3>
+
+				<form method="POST">
+					{% csrf_token %}
+					{{form.title}}
+					<input class="btn btn-info" type="submit" name="Update Taks">
+				</form>
+				
+			</div>
+		</div>
+
+	</body>
+
+{% endblock %}
+
