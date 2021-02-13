@@ -1,4 +1,5 @@
 {% extends 'todo/index.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -20,14 +21,20 @@
 		</style>
 
 
-		<div class="container">
+		<div class="container" style="height: 50%;">
 			<div class="card card-body">
 				<h3 class='h3'>Update Tasks</h3>
 
 				<form method="POST">
 					{% csrf_token %}
-					{{form.title}}
-					<input class="btn btn-info" type="submit" name="Update Taks">
+					<div class="" style="text-align: center;">
+						{{ upform.as_p }}
+						<!-- <h5>Title</h5>{{ upform.title }}<br>
+						<h5>Completed</h5>{{ upform.completed }} -->
+						<input class="btn btn-info" type="submit" name="Update Taks">
+					</div>
+					
+
 				</form>
 				
 			</div>

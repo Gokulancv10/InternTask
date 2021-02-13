@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import Todo
-from .forms import TodoForm
+from .forms import TodoForm, userRegisterForm, updateTodo
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_protect
-from .forms import userRegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
@@ -44,9 +43,7 @@ def home(request):
     
     comp_upcoming = Todo.objects.filter(completed=True)
 
-    user = request.user
-
-    todo_items = Todo.objects.filter(user_id=user).order_by('-date_created')
+    todo_items = Todo.objects.filter(user_id=request.user).order_by('-date_created')
 
     context = {'todo_items':todo_items,'comp_upcoming':comp_upcoming, 'todo_form':todo_form}
     return render(request, 'todo/main.html', context)
@@ -65,7 +62,7 @@ def add_new_task(request):
             data = t_form.cleaned_data.get('title')
             completed = t_form.cleaned_data.get('completed')
 
-            obj = Todo.objects.create(date_created=current, title=f'{data} {completed}', user_id=request.user)
+            obj = Todo.objects.create(date_created=current, title=data, user_id=request.user)
 
     # context = {'obj':obj}
 
@@ -73,15 +70,17 @@ def add_new_task(request):
 
 @csrf_protect
 def update_todo(request, pk):
+
     obj = Todo.objects.get(id=pk)
-    form = TodoForm(instance=obj)
+
+    upform = TodoForm(instance=obj)
     if request.method == 'POST':
-        form = TodoForm(request.POST, instance=obj)
-        if form.is_valid():
-            form.save()
+        upform = TodoForm(request.POST, instance=obj)
+        if upform.is_valid():
+            upform.save()
             return redirect('/')
 
-    context = {'form':form}
+    context = {'upform':upform}
     return render(request, 'todo/update_task.html', context)
 
 
