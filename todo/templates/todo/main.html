@@ -1,54 +1,45 @@
 {% extends 'todo/index.html' %}
 
-
 {% block content %}
 
 	<div class="center-column">
 
 		<h2 class="heading" style="text-align: center;">Hello {{ request.user.username }}, Here's your ToDo List</h2>
 		
-		<form action="{% url 'add_new_task' %}" method="POST" >
+		<form action="{% url 'home' %}" method="POST" >
 			{% csrf_token %}
-			<div placeholder="type here..." style="text-align: center; width:100%;">
+			<div style="text-align: center; width:100%;">
 				{{ todo_form.title }}
+
+				<button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2">Add Items</button>
+
 			</div>
 			
-			<!-- <input name='content' type="text" class="form-control mb-2 mr-sm-2 mt-3" placeholder="type here..." style="text-align: center;"> -->
-			<!-- <input type="date" name='due_date' style="margin-bottom: 3px;"> -->
-			<button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2">Add Items</button>
 		</form>
+
 
 		<h4 class="heading" style="text-align: center;">Upcoming ToDo Items</h4><br>
 		<div class="row">
 	        <div class="col">
 	            <ul class="list-group">
-	                {% for i in todo_items %}
+	                {% for i in todo_items_upcoming %}
 
-						{% if i.completed != True %}
-							<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
-								<div class="float-right">
-									<form action="{% url 'delete_todo' i.id %}" method="POST">
-										{% csrf_token %}
-										<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1">Delete</button>
-									</form>
-								</div>
+						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
-								<div class="float-right" id="completedbtn">
-									<form action="{% url 'update_todo' i.id %}" method="POST">
-										{% csrf_token %}
-										<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1">Update</button>
-									</form>
-								</div>
+							<div class="float-right">
 
-								<div class="float-right">
-									<form action="" method="POST">
-										{% csrf_token %}
-										<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1">{{ i.date_created }}</button>
-									</form>
-								</div>
+								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+								
+							</div>
+
+							<div class="float-right">
+
+								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+
+							</div>
+						
+						</li>
 							
-							</li>
-							{% endif %}
                 	{% endfor %}
            		</ul>
         	</div>
@@ -60,21 +51,23 @@
 	        	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
 	            <ul class="list-group" id='compItems'>
 
-	                {% for i in todo_items %}
+	                {% for i in todo_items_completed %}<hr>
 
-						{% if i.completed == True %}
+                    	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
-	                    	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
-
-							<div class="float-right">
-								<form action="{% url 'delete_todo' i.id %}" method="POST">
-									{% csrf_token %}
-									<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1">Delete</button>
-								</form>
-							</div>
+						<div class="float-right">
+							<form action="{% url 'delete_todo' i.id %}" method="POST">
+								{% csrf_token %}
+								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1">Delete</button>
+							</form>
+						</div>
 							
-						{% endif %}
 
+						<div class="float-right">
+
+							<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+
+						</div>
                     	</li>
                 	{% endfor %}
 

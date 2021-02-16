@@ -6,9 +6,11 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 
 urlpatterns = [
-	path('', views.home, name='home'),
-    path('a/', views.add_new_task, name='add_new_task'),
+
+ 	path('', views.home, name='home'),
+
     path('update_todo/<int:pk>/', views.update_todo, name='update_todo'),
+
     path('delete_todo/<int:pk>/', views.delete_todo, name='delete_todo'),
 
 	path('register/', views.register, name='register'),

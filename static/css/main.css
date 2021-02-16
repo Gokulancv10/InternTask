@@ -39,3 +39,7 @@ input::placeholder {
 	background-color: #ffae19;
 	border-color: #e59400;
 }
+
+a{
+	color: aliceblue;
+}

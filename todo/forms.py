@@ -1,17 +1,16 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import *
+from .models import Todo, Todolist
 
 from django.contrib.auth.forms import User
 from django.contrib.auth.forms import UserCreationForm
 
 class TodoForm(forms.ModelForm):
-
-	class Meta:
-
-		model = Todo
-		fields = ['title', 'completed']
+    
+    class Meta:
+        model = Todo
+        fields = ['title', 'completed']
 
 
 
