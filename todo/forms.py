@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import Todo, Todolist
+from .models import Todo
 
 from django.contrib.auth.forms import User
 from django.contrib.auth.forms import UserCreationForm
