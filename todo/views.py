@@ -43,9 +43,9 @@ def home(request):
     todo_form = TodoForm()
     current = timezone.now()
 
-    todo_items_upcoming = Todo.objects.filter(user_id=request.user).filter(completed=False).order_by('-date_created')
+    todo_items_upcoming = Todo.objects.filter(user_id=request.user, completed=False).order_by('-date_created')
 
-    todo_items_completed = Todo.objects.filter(user_id=request.user).filter(completed=True)
+    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True)
 
     if request.method == "POST":
         todo_form = TodoForm(request.POST)
@@ -64,42 +64,57 @@ def update_todo(request, pk):
     try :
         obj = Todo.objects.get(id=pk)
 
-        upform = TodoForm(instance=obj)
-        if request.method == 'POST':
-            upform = TodoForm(request.POST, instance=obj)
-            if upform.is_valid():
-                upform.save()
-                return redirect('/')
-
-        context = {'upform':upform}
-        return render(request, 'todo/update_task.html', context)
-
     except Exception as err:
         raise Http404(err)
+
+    upform = TodoForm(instance=obj)
+    if request.method == 'POST':
+        upform = TodoForm(request.POST, instance=obj)
+        if upform.is_valid():
+            upform.save()
+            return redirect('/')
+
+    context = {'upform':upform}
+
+    if obj.user_id != request.user:
+        raise Http404()
+    else:
+
+        return render(request, 'todo/update_task.html', context)
+
+    
 
 @login_required(login_url='login') 
 def delete_todo(request, pk):
 
     try:
         obj = Todo.objects.get(id=pk)
-        obj.delete()
-
-        # context = {'obj':obj}
-        return redirect('/')
 
     except Exception as err:
         raise Http404(err)
+
+    obj.delete()
+
+    if obj.user_id != request.user:
+        raise Http404()
+    else:
+        return redirect('/')
+
+
 
 @login_required(login_url='login')
 def completed_todo(request, pk):
 
     try:
         obj = Todo.objects.get(id=pk)
-        obj.completed = True
-        obj.save()
-
-        # context = {'obj':obj}
-        return redirect('/')
 
     except Exception as err:
         raise Http404(err)
+
+    obj.completed = True
+    obj.save()
+
+    if obj.user_id != request.user:
+        raise Http404()
+    else:
+        return redirect('/')
