@@ -1,4 +1,6 @@
 {% extends 'todo/index.html' %}
+{% load crispy_forms_tags %}
+
 
 {% block content %}
 
@@ -6,11 +8,12 @@
 
 		<h2 class="heading" style="text-align: center;">Hello {{ request.user.username }}, Here's your ToDo List</h2>
 		
-		<form action="{% url 'home' %}" method="POST" >
+		<form action="" method="POST" id='form-create'>
 			{% csrf_token %}
-			<div style="text-align: center; width:100%;">
-				{{ todo_form.title }}
+			<div style="text-align: center;">
 
+				{{ todo_form.title }}
+				
 				<button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2">Add Items</button>
 
 			</div>
@@ -20,8 +23,8 @@
 
 		<h4 class="heading" style="text-align: center;">Upcoming ToDo Items</h4><br>
 		<div class="row">
-	        <div class="col">
-	            <ul class="list-group">
+	        <div class="col" id="upcomItem">
+	            <ul class="list-group" id="upcomingItems">
 	                {% for i in todo_items_upcoming %}
 
 						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
@@ -34,10 +37,17 @@
 
 							<div class="float-right">
 
-								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
 
 							</div>
+
+							<div class="float-right">
 						
+								<button type="submit" class="btn-sm btn-dark ml-2 mt-2 mr-2 mb-1" id="completed_btn"><a href="{% url 'completed_todo' i.id %}">Completed</a></button>
+
+							</div>
+							
+										
 						</li>
 							
                 	{% endfor %}
@@ -56,11 +66,10 @@
                     	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
 						<div class="float-right">
-							<form action="{% url 'delete_todo' i.id %}" method="POST">
-								{% csrf_token %}
-								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1">Delete</button>
-							</form>
-						</div>
+
+							<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+								
+						</div>	
 							
 
 						<div class="float-right">

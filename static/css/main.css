@@ -41,5 +41,18 @@ input::placeholder {
 }
 
 a{
-	color: aliceblue;
+	color: white;
+}
+
+.h3{
+	
+	text-align: center;
+}
+
+.card-body{
+	background-color: #c4c5c6;
+}
+
+.container{
+	margin-top: 10%;
 }

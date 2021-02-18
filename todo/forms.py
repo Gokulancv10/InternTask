@@ -22,12 +22,5 @@ class userRegisterForm(UserCreationForm):
         fields = ['username','email','password1','password2']
 
 
-class updateTodo(forms.ModelForm):
-    
-    class Meta:
-
-        model = Todo
-        fields = ['title', 'completed']
-
 
 		

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseNotFound, JsonResponse
 from .models import Todo
 from .forms import *
 from django.utils import timezone
@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
+from django.views.generic import View
 from django.contrib.auth.models import User
 
 
@@ -61,22 +61,45 @@ def home(request):
 @login_required(login_url='login')
 def update_todo(request, pk):
 
-    obj = Todo.objects.get(id=pk)
+    try :
+        obj = Todo.objects.get(id=pk)
 
-    upform = TodoForm(instance=obj)
-    if request.method == 'POST':
-        upform = TodoForm(request.POST, instance=obj)
-        if upform.is_valid():
-            upform.save()
-            return redirect('/')
+        upform = TodoForm(instance=obj)
+        if request.method == 'POST':
+            upform = TodoForm(request.POST, instance=obj)
+            if upform.is_valid():
+                upform.save()
+                return redirect('/')
 
-    context = {'upform':upform}
-    return render(request, 'todo/update_task.html', context)
+        context = {'upform':upform}
+        return render(request, 'todo/update_task.html', context)
 
+    except Exception as err:
+        raise Http404(err)
 
+@login_required(login_url='login') 
 def delete_todo(request, pk):
-    obj = Todo.objects.get(id=pk)
-    obj.delete()
 
-    context = {'obj':obj}
-    return redirect('/')
+    try:
+        obj = Todo.objects.get(id=pk)
+        obj.delete()
+
+        # context = {'obj':obj}
+        return redirect('/')
+
+    except Exception as err:
+        raise Http404(err)
+
+@login_required(login_url='login')
+def completed_todo(request, pk):
+
+    try:
+        obj = Todo.objects.get(id=pk)
+        obj.completed = True
+        obj.save()
+
+        # context = {'obj':obj}
+        return redirect('/')
+
+    except Exception as err:
+        raise Http404(err)
