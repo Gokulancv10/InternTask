@@ -67,19 +67,19 @@ def update_todo(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    upform = TodoForm(instance=obj)
-    if request.method == 'POST':
-        upform = TodoForm(request.POST, instance=obj)
-        if upform.is_valid():
-            upform.save()
-            return redirect('/')
-
-    context = {'upform':upform}
-
+    
     if obj.user_id != request.user:
         raise Http404()
     else:
 
+        upform = TodoForm(instance=obj)
+        if request.method == 'POST':
+            upform = TodoForm(request.POST, instance=obj)
+            if upform.is_valid():
+                upform.save()
+                return redirect('/')
+
+        context = {'upform':upform}
         return render(request, 'todo/update_task.html', context)
 
     
@@ -93,11 +93,10 @@ def delete_todo(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    obj.delete()
-
     if obj.user_id != request.user:
         raise Http404()
     else:
+        obj.delete()
         return redirect('/')
 
 
@@ -111,10 +110,10 @@ def completed_todo(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    obj.completed = True
-    obj.save()
-
+    
     if obj.user_id != request.user:
         raise Http404()
     else:
+        obj.completed = True
+        obj.save()
         return redirect('/')
