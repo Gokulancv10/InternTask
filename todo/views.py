@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 from django.contrib.auth.models import User
 
+from django.core.paginator import Paginator
 
 def register(request):
     form = userRegisterForm()
@@ -47,6 +48,17 @@ def home(request):
 
     todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True)
 
+
+    pagi1 = Paginator(todo_items_upcoming, 4)
+    pagi2 = Paginator(todo_items_completed, 4)
+
+
+    page_num = request.GET.get('page')
+    page_num2 = request.GET.get('page')
+
+    page_obj = pagi1.get_page(page_num)
+    page_obj2 = pagi2.get_page(page_num2)
+
     if request.method == "POST":
         todo_form = TodoForm(request.POST)
         if todo_form.is_valid():
@@ -54,7 +66,7 @@ def home(request):
 
             obj = Todo.objects.create(date_created=current, title=data, user_id=request.user)
 
-    context = {'todo_items_upcoming':todo_items_upcoming,'todo_items_completed':todo_items_completed, 'todo_form':todo_form}
+    context = {'todo_form':todo_form, 'page_obj':page_obj, 'page_obj2':page_obj2}
     return render(request, 'todo/main.html', context)
 
 
@@ -62,25 +74,20 @@ def home(request):
 def update_todo(request, pk):
 
     try :
-        obj = Todo.objects.get(id=pk)
+        obj = Todo.objects.get(id=pk, user_id=request.user)
 
     except Exception as err:
         raise Http404(err)
 
-    
-    if obj.user_id != request.user:
-        raise Http404()
-    else:
+    upform = TodoForm(instance=obj)
+    if request.method == 'POST':
+        upform = TodoForm(request.POST, instance=obj)
+        if upform.is_valid():
+            upform.save()
+            return redirect('/')
 
-        upform = TodoForm(instance=obj)
-        if request.method == 'POST':
-            upform = TodoForm(request.POST, instance=obj)
-            if upform.is_valid():
-                upform.save()
-                return redirect('/')
-
-        context = {'upform':upform}
-        return render(request, 'todo/update_task.html', context)
+    context = {'upform':upform}
+    return render(request, 'todo/update_task.html', context)
 
     
 
@@ -88,16 +95,13 @@ def update_todo(request, pk):
 def delete_todo(request, pk):
 
     try:
-        obj = Todo.objects.get(id=pk)
+        obj = Todo.objects.get(id=pk, user_id=request.user)
 
     except Exception as err:
         raise Http404(err)
 
-    if obj.user_id != request.user:
-        raise Http404()
-    else:
-        obj.delete()
-        return redirect('/')
+    obj.delete()
+    return redirect('/')
 
 
 
@@ -105,15 +109,12 @@ def delete_todo(request, pk):
 def completed_todo(request, pk):
 
     try:
-        obj = Todo.objects.get(id=pk)
+        obj = Todo.objects.get(id=pk, user_id=request.user)
 
     except Exception as err:
         raise Http404(err)
 
     
-    if obj.user_id != request.user:
-        raise Http404()
-    else:
-        obj.completed = True
-        obj.save()
-        return redirect('/')
+    obj.completed = True
+    obj.save()
+    return redirect('/')

@@ -4,6 +4,35 @@
 
 {% block content %}
 
+	<nav aria-label="...">
+		<ul class="pagination justify-content-center">
+
+			{% if page_obj.has_previous or page_obj2.has_previous %}
+
+				<li class="page-item">
+					<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">&laquo;</a>
+				</li>
+
+
+			{% endif %}
+
+
+			<li class="page-item active">
+				<a class="page-link" href="#">{{ page_obj.number }}</a>
+			</li>
+
+			{% if page_obj.has_next or page_obj2.has_next %}
+
+				<li class="page-item">
+					<a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+				</li>
+
+			{% endif %}
+
+		</ul>
+	</nav>
+
+
 	<div class="center-column">
 
 		<h2 class="heading" style="text-align: center;">Hello {{ request.user.username }}, Here's your ToDo List</h2>
@@ -25,7 +54,7 @@
 		<div class="row">
 	        <div class="col" id="upcomItem">
 	            <ul class="list-group" id="upcomingItems">
-	                {% for i in todo_items_upcoming %}
+	                {% for i in page_obj %}
 
 						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
@@ -61,7 +90,7 @@
 	        	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
 	            <ul class="list-group" id='compItems'>
 
-	                {% for i in todo_items_completed %}<hr>
+	                {% for i in page_obj2 %}<hr>
 
                     	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
@@ -83,6 +112,7 @@
            		</ul>
         	</div>
     	</div>
+
 
 
 	</div>
