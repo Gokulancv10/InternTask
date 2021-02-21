@@ -48,10 +48,8 @@ def home(request):
 
     todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True)
 
-
     pagi1 = Paginator(todo_items_upcoming, 4)
     pagi2 = Paginator(todo_items_completed, 4)
-
 
     page_num = request.GET.get('page')
     page_num2 = request.GET.get('page')
@@ -113,8 +111,8 @@ def completed_todo(request, pk):
 
     except Exception as err:
         raise Http404(err)
-
     
     obj.completed = True
     obj.save()
+    
     return redirect('/')

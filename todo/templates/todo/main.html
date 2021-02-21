@@ -7,27 +7,56 @@
 	<nav aria-label="...">
 		<ul class="pagination justify-content-center">
 
+			<!-- pagination - previous pages -->
 			{% if page_obj.has_previous or page_obj2.has_previous %}
 
 				<li class="page-item">
-					<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">&laquo;</a>
-				</li>
+					{% if page_obj.has_previous %}
 
+						<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">Prev</a>
+					
+					{% else %}
+
+						<a class="page-link" href="?page={{ page_obj2.previous_page_number }}" tabindex="-1">Prev</a>
+
+					{% endif %}
+				</li>
 
 			{% endif %}
 
-
+			<!-- pagination - current page -->
 			<li class="page-item active">
-				<a class="page-link" href="#">{{ page_obj.number }}</a>
+
+				{% if page_obj.has_next_page %}
+
+					<a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+
+
+				{% else %}
+
+					<a class="page-link" href="?page={{ page_obj2.number }}">{{ page_obj2.number }}</a>
+
+				{% endif %}
+
 			</li>
 
+			<!-- pagination - Next pages -->
 			{% if page_obj.has_next or page_obj2.has_next %}
 
 				<li class="page-item">
-					<a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+					{% if page_obj.has_next %}
+
+						<a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+					
+					{% else %}
+
+						<a class="page-link" href="?page={{ page_obj2.next_page_number }}">Next</a>
+
+					{% endif %}
 				</li>
 
 			{% endif %}
+
 
 		</ul>
 	</nav>
@@ -54,6 +83,7 @@
 		<div class="row">
 	        <div class="col" id="upcomItem">
 	            <ul class="list-group" id="upcomingItems">
+
 	                {% for i in page_obj %}
 
 						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
@@ -74,12 +104,12 @@
 						
 								<button type="submit" class="btn-sm btn-dark ml-2 mt-2 mr-2 mb-1" id="completed_btn"><a href="{% url 'completed_todo' i.id %}">Completed</a></button>
 
-							</div>
-							
+							</div>				
 										
 						</li>
 							
                 	{% endfor %}
+
            		</ul>
         	</div>
     	</div>
@@ -90,6 +120,7 @@
 	        	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
 	            <ul class="list-group" id='compItems'>
 
+
 	                {% for i in page_obj2 %}<hr>
 
                     	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
@@ -98,8 +129,7 @@
 
 							<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
 								
-						</div>	
-							
+						</div>								
 
 						<div class="float-right">
 
@@ -113,10 +143,6 @@
         	</div>
     	</div>
 
-
-
 	</div>
-
-
 
 {% endblock %}
