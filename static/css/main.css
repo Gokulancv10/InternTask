@@ -15,9 +15,9 @@ input::placeholder {
 }
 
 .center-column{
-	width:80%;
-	margin: 10px auto;
-	padding:20px;
+	width:100%;
+	margin: 10px;
+	padding: 10px;
 	background-color: #fff;
 	border-radius: 3px;
 	box-shadow: 6px 2px 30px 0px rgba(0,0,0,0.75);
@@ -28,7 +28,7 @@ input::placeholder {
 .item-row{
 	background-color: #906abd;
 	margin: 10px;
-	padding: 20px;
+	padding: 10px;
 	border-radius: 3px;
 	color: #fff;
 	font-size: 16px;

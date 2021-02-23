@@ -4,63 +4,6 @@
 
 {% block content %}
 
-	<nav aria-label="...">
-		<ul class="pagination justify-content-center">
-
-			<!-- pagination - previous pages -->
-			{% if page_obj.has_previous or page_obj2.has_previous %}
-
-				<li class="page-item">
-					{% if page_obj.has_previous %}
-
-						<a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">Prev</a>
-					
-					{% else %}
-
-						<a class="page-link" href="?page={{ page_obj2.previous_page_number }}" tabindex="-1">Prev</a>
-
-					{% endif %}
-				</li>
-
-			{% endif %}
-
-			<!-- pagination - current page -->
-			<li class="page-item active">
-
-				{% if page_obj.has_next_page %}
-
-					<a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
-
-
-				{% else %}
-
-					<a class="page-link" href="?page={{ page_obj2.number }}">{{ page_obj2.number }}</a>
-
-				{% endif %}
-
-			</li>
-
-			<!-- pagination - Next pages -->
-			{% if page_obj.has_next or page_obj2.has_next %}
-
-				<li class="page-item">
-					{% if page_obj.has_next %}
-
-						<a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-					
-					{% else %}
-
-						<a class="page-link" href="?page={{ page_obj2.next_page_number }}">Next</a>
-
-					{% endif %}
-				</li>
-
-			{% endif %}
-
-
-		</ul>
-	</nav>
-
 
 	<div class="center-column">
 
@@ -79,7 +22,19 @@
 		</form>
 
 
-		<h4 class="heading" style="text-align: center;">Upcoming ToDo Items</h4><br>
+		<h4 class="heading" style="text-align: center;">Upcoming ToDo Items</h4>
+		
+		<ul class="pagination justify-content-center">
+
+			{% for i in pagi1.page_range %}
+
+	    		<li class="page-item {% if i == page_num %} active {% endif %}">
+	        			<a class="page-link" href="?page={{ i }}">{{ i }}</a>
+	    		</li>
+
+    		{% endfor %}
+    	</ul>
+
 		<div class="row">
 	        <div class="col" id="upcomItem">
 	            <ul class="list-group" id="upcomingItems">
@@ -108,40 +63,53 @@
 										
 						</li>
 							
-                	{% endfor %}
-
+                	{% endfor %}               		
+                	
            		</ul>
+           		
         	</div>
     	</div>
 
-		<hr style="border-top: 1px solid #999; ">
-    	<div class="row">
-	        <div class="col">
-	        	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
-	            <ul class="list-group" id='compItems'>
+	</div>
+
+	<div class="center-column">
+
+    	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
 
 
-	                {% for i in page_obj2 %}<hr>
+		<ul class="pagination justify-content-center">
 
-                    	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
+			{% for i in pagi2.page_range %}
 
-						<div class="float-right">
+	    		<li class="page-item {% if i == page_num2 %} active {% endif %}">
+	        			<a class="page-link" href="?page={{ i }}">{{ i }}</a>
+	    		</li>
 
-							<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
-								
-						</div>								
+    		{% endfor %}
+    	</ul>
 
-						<div class="float-right">
+    	            		
+        <ul class="list-group" id='compItems'>
 
-							<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+            {% for i in page_obj2 %}<hr>
 
-						</div>
-                    	</li>
-                	{% endfor %}
+            	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
-           		</ul>
-        	</div>
-    	</div>
+				<div class="float-right">
+
+					<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+						
+				</div>								
+
+				<div class="float-right">
+
+					<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+
+				</div>
+            	</li>
+        	{% endfor %}
+
+   		</ul>
 
 	</div>
 

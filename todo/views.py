@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, Http404, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, Http404, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from .models import Todo
 from .forms import *
 from django.utils import timezone
@@ -64,7 +64,8 @@ def home(request):
 
             obj = Todo.objects.create(date_created=current, title=data, user_id=request.user)
 
-    context = {'todo_form':todo_form, 'page_obj':page_obj, 'page_obj2':page_obj2}
+    context = {'todo_form':todo_form, 'page_obj':page_obj, 'page_obj2':page_obj2, 'pagi1':pagi1, 'pagi2':pagi2,
+                 'page_num2':int(page_num2),'page_num':int(page_num)}
     return render(request, 'todo/main.html', context)
 
 
@@ -99,7 +100,8 @@ def delete_todo(request, pk):
         raise Http404(err)
 
     obj.delete()
-    return redirect('/')
+    # return redirect('/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 
@@ -115,4 +117,5 @@ def completed_todo(request, pk):
     obj.completed = True
     obj.save()
     
-    return redirect('/')
+    # return redirect('/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
