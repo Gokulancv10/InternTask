@@ -1,9 +1,10 @@
 
 input {
-	width: 50%;
+	width: 80%;
 	padding: 6px 20px;
 	margin: 8px 0;
 	box-sizing: border-box;
+	height: 40px;
 }
 
 input::placeholder {
@@ -12,6 +13,13 @@ input::placeholder {
 
 .submit{
 	background-color: #6BA3E8;
+}
+
+#addItem{
+	width: 20%;
+	padding: 6px 20px;
+	margin: 8px 3px;
+	height: 40px;
 }
 
 .center-column{
@@ -44,7 +52,7 @@ a{
 	color: white;
 }
 
-.h3{
+.h3, h4, h2{
 	
 	text-align: center;
 }
@@ -56,3 +64,11 @@ a{
 .container{
 	margin-top: 2%;
 }
+
+form #form-create{
+	text-align: center;
+}
+
+/* #id_title{
+	border-radius: 10px;
+} */

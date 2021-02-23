@@ -7,22 +7,23 @@
 
 	<div class="center-column">
 
-		<h2 class="heading" style="text-align: center;">Hello {{ request.user.username }}, Here's your ToDo List</h2>
-		
-		<form action="" method="POST" id='form-create'>
-			{% csrf_token %}
-			<div style="text-align: center;">
-
-				{{ todo_form.title }}
+		<h2 class="heading">Hello {{ request.user.username }}, Here's your ToDo List</h2>
 				
-				<button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2">Add Items</button>
+			<form action="" method="POST" id='form-create'>
+				{% csrf_token %}		
 
-			</div>
-			
-		</form>
+				<div class="input-group-append">
+					{{ todo_form.title}}
 
+					<button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2" id="addItem">Add Items</button>
 
-		<h4 class="heading" style="text-align: center;">Upcoming ToDo Items</h4>
+				</div>
+
+			</form>
+		
+		
+		<!-- Upcoming To DO Items -->
+		<h4 class="heading">Upcoming ToDo Items</h4>
 		
 		<ul class="pagination justify-content-center">
 
@@ -72,11 +73,12 @@
 
 	</div>
 
+
+<!-- Completed To Do Items -->
 	<div class="center-column">
 
-    	<h4 class="heading" style="text-align: center;">Completed ToDo Items</h4>
-
-
+    	<h4 class="heading">Completed ToDo Items</h4>
+		
 		<ul class="pagination justify-content-center">
 
 			{% for i in pagi2.page_range %}
@@ -88,28 +90,34 @@
     		{% endfor %}
     	</ul>
 
-    	            		
-        <ul class="list-group" id='compItems'>
+		<div class="row">
+	        <div class="col" id="upcomItem">
+	            <ul class="list-group" id="upcomingItems">
 
-            {% for i in page_obj2 %}<hr>
+	                {% for i in page_obj2 %}
 
-            	<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
+						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
 
-				<div class="float-right">
+							<div class="float-right">
 
-					<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
-						
-				</div>								
+								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+								
+							</div>
 
-				<div class="float-right">
+							<div class="float-right">
 
-					<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" ><a href="{% url 'update_todo' i.id %}">Update</a></button>
+								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
 
-				</div>
-            	</li>
-        	{% endfor %}
-
-   		</ul>
+							</div>			
+										
+						</li>
+							
+                	{% endfor %}               		
+                	
+           		</ul>
+           		
+        	</div>
+    	</div>
 
 	</div>
 
