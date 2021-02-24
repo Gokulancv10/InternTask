@@ -30,7 +30,7 @@
 			{% for i in pagi1.page_range %}
 
 	    		<li class="page-item {% if i == page_num %} active {% endif %}">
-	        			<a class="page-link" href="?page={{ i }}">{{ i }}</a>
+	        			<a class="page-link" href="?upcoming={{ i }}">{{ i }}</a>
 	    		</li>
 
     		{% endfor %}
@@ -84,7 +84,7 @@
 			{% for i in pagi2.page_range %}
 
 	    		<li class="page-item {% if i == page_num2 %} active {% endif %}">
-	        			<a class="page-link" href="?page={{ i }}">{{ i }}</a>
+	        			<a class="page-link" href="?completed={{ i }}">{{ i }}</a>
 	    		</li>
 
     		{% endfor %}

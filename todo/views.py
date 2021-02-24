@@ -51,8 +51,8 @@ def home(request):
     pagi1 = Paginator(todo_items_upcoming, 4)
     pagi2 = Paginator(todo_items_completed, 4)
 
-    page_num = request.GET.get('page')
-    page_num2 = request.GET.get('page')
+    page_num = request.GET.get('upcoming', 1)
+    page_num2 = request.GET.get('completed', 1)
 
     page_obj = pagi1.get_page(page_num)
     page_obj2 = pagi2.get_page(page_num2)
