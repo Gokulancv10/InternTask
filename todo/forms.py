@@ -13,14 +13,10 @@ class TodoForm(forms.ModelForm):
         fields = ['title', 'completed']
 
 
-
 class userRegisterForm(UserCreationForm):
     email = forms.EmailField()
 
     class Meta:
         model = User
         fields = ['username','email','password1','password2']
-
-
-
 		

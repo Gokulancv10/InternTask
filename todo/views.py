@@ -58,9 +58,9 @@ def home(request):
     page_obj2 = pagi2.get_page(page_num2)
 
     if request.method == "POST":
-        todo_form = TodoForm(request.POST)
-        if todo_form.is_valid():
-            data = todo_form.cleaned_data.get('title')
+        todo_form1 = TodoForm(request.POST)
+        if todo_form1.is_valid():
+            data = todo_form1.cleaned_data.get('title')
 
             obj = Todo.objects.create(date_created=current, title=data, user_id=request.user)
 
