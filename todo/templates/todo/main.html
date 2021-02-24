@@ -7,7 +7,9 @@
 
 	<div class="center-column">
 
-		<h2 class="heading">Hello {{ request.user.username }}, Here's your ToDo List</h2>
+<!-- 		<h3 class="card-title">Hello {{ request.user.username|upper }}</h3> -->
+
+			<h5 class="card-title">Create your List</h5>
 				
 			<form action="" method="POST" id='form-create'>
 				{% csrf_token %}		
@@ -20,137 +22,154 @@
 				</div>
 
 			</form>
-		
-		
-		<!-- Upcoming To DO Items -->
-		<h4 class="heading">Upcoming ToDo Items</h4>
-		
-		<ul class="pagination justify-content-center">
-
-			{% if page_obj.has_previous %}
-
-				<li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-        			<a class="page-link" href="?upcoming={{ page_obj.previous_page_number }}">&laquo</a>
-    			</li>
-
-    		{% endif %}
-
-			{% for i in pagi1.page_range %}
-
-	    		<li class="page-item {% if i == page_num %} active {% endif %}">
-	        			<a class="page-link" href="?upcoming={{ i }}&completed={{page_num2}}">{{ i }}</a>
-	    		</li>
-
-    		{% endfor %}
-
-    		{% if page_obj.has_next %}
-
-				<li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-        			<a class="page-link" href="?upcoming={{ page_obj.next_page_number }}">&raquo</a>
-    			</li>
-
-    		{% endif %}
-    	</ul>
-
-		<div class="row">
-	        <div class="col" id="upcomItem">
-	            <ul class="list-group" id="upcomingItems">
-
-	                {% for i in page_obj %}
-
-						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
-
-							<div class="float-right">
-
-								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
-								
-							</div>
-
-							<div class="float-right">
-
-								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
-
-							</div>
-
-							<div class="float-right">
-						
-								<button type="submit" class="btn-sm btn-dark ml-2 mt-2 mr-2 mb-1" id="completed_btn"><a href="{% url 'completed_todo' i.id %}">Completed</a></button>
-
-							</div>				
-										
-						</li>
-							
-                	{% endfor %}               		
-                	
-           		</ul>
-           		
-        	</div>
-    	</div>
-
 	</div>
+		
+	
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+
+					<h4 class="card-title">Upcoming Items</h4>
+					<hr>
+
+		            <ul class="list-group" id="upcomingItems">
+
+		                {% for i in page_obj %}
+
+							<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
+
+								<div class="float-right">
+
+									<button type="submit" class="btn btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+									
+								</div>
+
+								<div class="float-right">
+
+									<button type="submit" class="btn btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
+
+								</div>
+
+								<div class="float-right">
+							
+									<button type="submit" class="btn btn-sm btn-dark ml-2 mt-2 mr-2 mb-1" id="completed_btn"><a href="{% url 'completed_todo' i.id %}">Completed</a></button>
+
+								</div>				
+											
+							</li>
+								
+	                	{% endfor %}               		
+	                	
+	           		</ul>
+
+	           		<hr>
+
+					<ul class="pagination justify-content-center">
+
+						{% if page_obj.has_previous %}
+
+							<li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+			        			<a class="page-link" href="?upcoming={{ page_obj.previous_page_number }}&completed={{page_num2}}">&laquo</a>
+			    			</li>
+
+			    		{% endif %}
+
+						{% for i in pagi1.page_range %}
+
+				    		<li class="page-item {% if i == page_num %} active {% endif %}">
+				        			<a class="page-link" href="?upcoming={{ i }}&completed={{page_num2}}">{{ i }}</a>
+				    		</li>
+
+			    		{% endfor %}
+
+			    		{% if page_obj.has_next %}
+
+							<li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+			        			<a class="page-link" href="?upcoming={{ page_obj.next_page_number }}&completed={{page_num2}}">&raquo</a>
+			    			</li>
+
+			    		{% endif %}
+			    	</ul>
+			           		
+
+				</div>
+								
+			</div>
+		</div>
+
+
+
+
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+
+			    	<h4 class="card-title">Completed Items</h4>
+			    	<hr>
+					
+		            <ul class="list-group" id="upcomingItems">
+
+		                {% for i in page_obj2 %}
+
+							<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
+
+								<div class="float-right">
+
+									<button type="submit" class="btn btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
+									
+								</div>
+
+								<div class="float-right">
+
+									<button type="submit" class=" btn btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
+
+								</div>			
+											
+							</li>
+								
+	                	{% endfor %}               		
+	                	
+	           		</ul>
+
+	           		<hr>
+
+					<ul class="pagination justify-content-center">
+
+						{% if page_obj2.has_previous %}
+
+							<li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+			        			<a class="page-link" href="?completed={{ page_obj2.previous_page_number }}&upcoming={{page_num}}">&laquo</a>
+			    			</li>
+
+			    		{% endif %}
+
+						{% for i in pagi2.page_range %}
+
+				    		<li class="page-item {% if i == page_num2 %} active {% endif %}">
+				        			<a class="page-link" href="?completed={{ i }}&upcoming={{page_num}}">{{ i }}</a>
+				    		</li>
+
+			    		{% endfor %}
+
+			    		{% if page_obj2.has_next %}
+
+							<li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+			        			<a class="page-link" href="?completed={{ page_obj2.next_page_number }}&upcoming={{page_num}}">&raquo</a>
+			    			</li>
+
+			    		{% endif %}
+
+			    	</ul>	           		
+			          					
+				</div>
+			</div>
+		</div>
+	</div>
+			
 
 
 <!-- Completed To Do Items -->
-	<div class="center-column">
 
-    	<h4 class="heading">Completed ToDo Items</h4>
-		
-		<ul class="pagination justify-content-center">
-
-			{% if page_obj2.has_previous %}
-
-				<li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-        			<a class="page-link" href="?completed={{ page_obj2.previous_page_number }}">&laquo</a>
-    			</li>
-
-    		{% endif %}
-
-			{% for i in pagi2.page_range %}
-
-	    		<li class="page-item {% if i == page_num2 %} active {% endif %}">
-	        			<a class="page-link" href="?completed={{ i }}&upcoming={{page_num}}">{{ i }}</a>
-	    		</li>
-
-    		{% endfor %}
-
-    		{% if page_obj2.has_next %}
-
-				<li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-        			<a class="page-link" href="?completed={{ page_obj2.next_page_number }}">&raquo</a>
-    			</li>
-
-    		{% endif %}
-    	</ul>
-
-		<div class="row">
-	        <div class="col" id="upcomItem">
-	            <ul class="list-group" id="upcomingItems">
-
-	                {% for i in page_obj2 %}
-
-						<li class="list-group-item list-group-item-primary mb-2" id="upcomingItem">{{ i.title }}
-
-							<div class="float-right">
-
-								<button type="submit" class="btn-sm btn-danger ml-2 mt-2 mr-2 mb-1"><a href="{% url 'delete_todo' i.id %}">Delete</a></button>
-								
-							</div>
-
-							<div class="float-right">
-
-								<button type="submit" class="btn-sm btn-success ml-2 mt-2 mr-2 mb-1" id="update_btn"><a href="{% url 'update_todo' i.id %}">Update</a></button>
-
-							</div>			
-										
-						</li>
-							
-                	{% endfor %}               		
-                	
-           		</ul>
-           		
-        	</div>
-    	</div>
-
-	</div>
 
 {% endblock %}

@@ -46,7 +46,7 @@ def home(request):
 
     todo_items_upcoming = Todo.objects.filter(user_id=request.user, completed=False).order_by('-date_created')
 
-    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True)
+    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True).order_by('-date_created')
 
     pagi1 = Paginator(todo_items_upcoming, 4)
     pagi2 = Paginator(todo_items_completed, 4)

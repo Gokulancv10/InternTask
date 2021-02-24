@@ -23,15 +23,32 @@ input::placeholder {
 }
 
 .center-column{
-	width:100%;
+	width: 98%;
 	margin: 10px;
 	padding: 10px;
-	background-color: #fff;
+	/* background-color: #fff; */
 	border-radius: 3px;
 	box-shadow: 6px 2px 30px 0px rgba(0,0,0,0.75);
-	position: relative;
 }
 
+a:link{
+	color: white;
+}
+
+.card-body{
+	border-radius: 3px;
+	box-shadow: 3px 3px 20px 0px rgba(0,0,0,0.75);
+	justify-self: center;
+}
+
+
+hr{
+	border-top: 1px solid black;
+}
+
+#id_completed{
+	border: 2px solid black;
+}
 
 .item-row{
 	background-color: #906abd;
@@ -52,23 +69,32 @@ a{
 	color: white;
 }
 
-.h3, h4, h2{
+.user{
+	color: white;
+}
+
+h3, h4, h2, h5{
 	
 	text-align: center;
 }
 
-.card-body{
-	background-color: #c4c5c6;
+.update_todo{
+	margin: 0 auto;
+	float: none;
+	width: 70%;
+	text-align: center;
+	justify-content: center;
 }
 
 .container{
-	margin-top: 2%;
+	margin-top: 1%;
 }
 
 form #form-create{
 	text-align: center;
 }
 
-/* #id_title{
-	border-radius: 10px;
-} */
+.page-link{
+	border: 0.5px solid #3058f4;
+	border-radius: 2px;
+}

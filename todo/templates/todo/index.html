@@ -26,7 +26,8 @@
 <body>
 
 	<nav class="navbar navbar-dark bg-dark">
-	    <a class="navbar-brand" href="{% url 'home' %}" style="text-align: 50%;">TODOAPP</a>
+	    <h3 class="navbar-brand" style="text-align: 50%;">To-Do App</h3>
+	    <h3 class="card-title user">Hello {{ request.user.username|upper }}</h3>
 
 	    <div class="form-inline">
             {% if user.is_authenticated %}
