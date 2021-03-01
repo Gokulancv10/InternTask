@@ -1,10 +1,9 @@
 from django import forms
 from django.forms import ModelForm
-
-from .models import Todo
-
+from .models import Todo, Task
 from django.contrib.auth.forms import User
 from django.contrib.auth.forms import UserCreationForm
+
 
 class TodoForm(forms.ModelForm):
     
@@ -12,6 +11,11 @@ class TodoForm(forms.ModelForm):
         model = Todo
         fields = ['title', 'completed']
 
+class TaskForm(forms.ModelForm):
+
+    class Meta:
+        model = Task
+        fields = ['heading', 'todo', 'completed']
 
 class userRegisterForm(UserCreationForm):
     email = forms.EmailField()
