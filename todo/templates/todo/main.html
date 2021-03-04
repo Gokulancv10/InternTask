@@ -5,9 +5,8 @@
     <div class="center-column">
         <h5 class="card-title">Create your List</h5>
 
-        <form action="" method="POST" id="form-create">
+        <form action="" method="POST">
             {% csrf_token %}
-
             <div class="input-group-append">
                 {{ todo_form.title }}
                 <button type="submit" class="form-control btn btn-primary mb-3 mr-sm-2" id="addItem">
@@ -49,13 +48,19 @@
                                 </div>
 
                                 <div class="float-right">
-                                    <button type="submit" class="btn btn-sm btn-primary ml-1 mt-1 mr-1 mb-1">
-                                        <a href="{% url 'addTodo' i.id %}">Add</a>
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-sm btn-primary ml-1 mt-1 mr-1 mb-1">
+                                        <a href="{% url 'addTodo' i.id %}" data-toggle="modal" data-target="#staticBackdrop">
+                                            Add
+                                        </a>                
                                     </button>
+                                    <!-- Modal -->
+                                    {% include 'todo/task_modal.html' %}
                                 </div>
 
                                 {% for j in i.tasks.all %}
                                     {% if i.tasks.all %}
+                                    {% if j.completed == False %}
                                         <div class="card mt-4">
                                             <ul class="list-group">
                                                 <li class="list-group-item list-group-item-danger" id="upcomingItem">
@@ -74,6 +79,7 @@
                                                 </li>
                                             </ul>
                                         </div>
+                                    {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             </li>
@@ -111,8 +117,31 @@
 
                     <ul class="list-group">
                         {% for i in page_obj2 %}
-
 							{% if i.tasks.all %}
+                                {% for j in i.tasks.all %}
+
+								<li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
+									{{ j.todo }}
+									<div class="float-right">
+										<button type="submit" class="btn btn-sm btn-danger mt-1 mb-1">
+											<a href="{% url 'delete_todo' i.id %}">❌</a>
+										</button>
+									</div>
+                                    <div class="card mt-4">
+                                        <ul class="list-group">
+                                            <li class="list-group-item list-group-item-danger">
+                                                {{ j.heading }}
+                                                <div class="float-right">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <a href="{% url 'delete_todo' j.id %}">❌</a>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>								
+								</li>
+                                {% endfor %}
+							{% else %}
 
 								<li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
 									{{ i.title }}
@@ -121,37 +150,7 @@
 											<a href="{% url 'delete_todo' i.id %}">❌</a>
 										</button>
 									</div>
-
-                                	{% for j in i.tasks.all %}        
-                                        <div class="card mt-4">
-                                            <ul class="list-group">
-                                                <li class="list-group-item list-group-item-danger">
-                                                    {{ j.heading }}
-
-                                                    <div class="float-right">
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <a href="{% url 'delete_todo' j.id %}">❌</a>
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    {% endfor %}
-
 								</li>
-
-							{% else %}
-
-								{% if page_obj2 %}
-									<li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
-										{{ i.title }}
-										<div class="float-right">
-											<button type="submit" class="btn btn-sm btn-danger mt-1 mb-1">
-												<a href="{% url 'delete_todo' i.id %}">❌</a>
-											</button>
-										</div>
-									</li>
-								{% endif %}
 
 							{% endif %}
                         {% endfor %}

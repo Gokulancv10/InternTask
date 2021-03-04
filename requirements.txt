@@ -1,3 +1,4 @@
 django==3.0
 django-crispy-forms==1.11
 django-bootstrap-modal-forms==2
+django-rest-framework

@@ -11,12 +11,14 @@
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<!-- <script src="{% static 'js/bootstrap.min.js' %}"></script> -->
 	<script type="text/javascript" src="{% static 'js/bsmodal.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/jquery.slim.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/index.js' %}"></script>
 	<script type="text/javascript" src="{% static 'jquery/jquery.min.js' %}"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 </head>
 <body>
@@ -35,6 +37,7 @@
                 <a class="nav-item nav-link" href="{% url 'register' %}"><button class="btn-sm btn-warning">Register</button></a>
             {% endif %}
         </div>
+		
 	</nav>
 
 	<div class='container'>
