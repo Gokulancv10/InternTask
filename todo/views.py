@@ -43,7 +43,7 @@ def home(request):
     current = timezone.now()
 
     todo_items_upcoming = Todo.objects.filter(user_id=request.user, completed=False).order_by('-date_created')
-    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True)
+    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True).order_by('-date_created')
 
     pagi1 = Paginator(todo_items_upcoming, 4)
     pagi2 = Paginator(todo_items_completed, 4)
@@ -60,8 +60,6 @@ def home(request):
             data = todo_form1.cleaned_data.get('title')
             obj = Todo.objects.create(
                 date_created=current, title=data, user_id=request.user)
-
-        return redirect('/')
 
     context = {'todo_form': todo_form, 'page_obj': page_obj, 'page_obj2': page_obj2,
                'pagi1': pagi1, 'pagi2': pagi2, 'page_num2': int(page_num2), 'page_num': int(page_num), 'task_form': task_form}
@@ -101,21 +99,17 @@ def update_todo(request, pk):
 @login_required(login_url='login')
 def add_todo(request, pk):
 
-    try:
-        obj = Todo.objects.get(id=pk, user_id=request.user)
-    except Exception as e:
-        raise Http404(e)
-    if request.method == 'POST':
-        t_form = TaskForm(request.POST)
-        if t_form.is_valid():
-            data = t_form.cleaned_data.get('heading')
-            todo_item = obj
-            ob = Task.objects.create(user=request.user, heading=data,
-                                todo=obj, date_created=timezone.now())
-            return redirect('/')
+    obj = Todo.objects.get(id=pk, user_id=request.user)
 
-    context = {'t_form': t_form}
-    return render(request, 'todo/home.html', context)
+    if request.method == 'POST':
+        if request.POST.get('heading'):
+            data = Task()
+            data.heading = request.POST.get('heading')
+            data.todo = obj
+            data.user = request.user
+            data.save()
+
+    return redirect('/')
 
 
 @login_required(login_url='login')

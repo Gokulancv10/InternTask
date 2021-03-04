@@ -55,7 +55,33 @@
                                         </a>                
                                     </button>
                                     <!-- Modal -->
-                                    {% include 'todo/task_modal.html' %}
+                                    <div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"                              aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel">Add New Task</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <form action="{% url 'addTodo' i.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="card">
+
+                                                            {{ task_form.heading }}
+
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success" type="submit">Submit</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {% for j in i.tasks.all %}
@@ -114,47 +140,48 @@
                 <div class="card-body">
                     <h4 class="card-title">Completed Items</h4>
                     <hr/>
-
-                    <ul class="list-group">
+                 
+                    <ul class="list-group" id="upcomingItems">
                         {% for i in page_obj2 %}
-							{% if i.tasks.all %}
+                            <li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
+                                {{ i.title }}
+
+                                <div class="float-right">
+                                    <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
+                                        <a href="{% url 'delete_todo' i.id %}">❌</a>
+                                    </button>
+                                </div>
+
+                                <div class="float-right">
+                                    <button type="submit" class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" id="update_btn">
+                                        <a href="{% url 'update_todo' i.id %}">Update</a>
+                                    </button>
+                                </div>
+
                                 {% for j in i.tasks.all %}
 
-								<li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
-									{{ j.todo }}
-									<div class="float-right">
-										<button type="submit" class="btn btn-sm btn-danger mt-1 mb-1">
-											<a href="{% url 'delete_todo' i.id %}">❌</a>
-										</button>
-									</div>
                                     <div class="card mt-4">
                                         <ul class="list-group">
-                                            <li class="list-group-item list-group-item-danger">
+                                            <li class="list-group-item list-group-item-danger" id="upcomingItem">
                                                 {{ j.heading }}
                                                 <div class="float-right">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                    <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
                                                         <a href="{% url 'delete_todo' j.id %}">❌</a>
+                                                    </button>
+                                                </div>
+
+                                                <div class="float-right">
+                                                    <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
+                                                        <a href="{% url 'completed_todo' j.id %}">Completed</a>
                                                     </button>
                                                 </div>
                                             </li>
                                         </ul>
-                                    </div>								
-								</li>
+                                    </div>
+
                                 {% endfor %}
-							{% else %}
-
-								<li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
-									{{ i.title }}
-									<div class="float-right">
-										<button type="submit" class="btn btn-sm btn-danger mt-1 mb-1">
-											<a href="{% url 'delete_todo' i.id %}">❌</a>
-										</button>
-									</div>
-								</li>
-
-							{% endif %}
+                            </li>
                         {% endfor %}
-                        
                     </ul>
                     <hr/>
 
