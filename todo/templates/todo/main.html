@@ -5,7 +5,7 @@
     <div class="center-column">
         <h5 class="card-title">Create your List</h5>
 
-        <form action="" method="POST">
+        <form action="" method="POST" id="addTodo">
             {% csrf_token %}
             <div class="input-group-append">
                 {{ todo_form.title }}
@@ -22,96 +22,124 @@
                 <div class="card-body">
                     <h4 class="card-title">Upcoming Items</h4>
                     <hr/>
+                    {% for i in page_obj %}
 
-                    <ul class="list-group" id="upcomingItems">
-                        {% for i in page_obj %}
+                        <ul class="list-group" id="upcomingItems">
 
                             <li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
                                 {{ i.title }}
 
                                 <div class="float-right">
+
+                                    <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
+                                        <a href="{% url 'completed_todo' i.id %}">Completed</a>
+                                    </button>
+
                                     <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
                                         <a href="{% url 'delete_todo' i.id %}">❌</a>
                                     </button>
+
                                 </div>
 
                                 <div class="float-right">
+                                    <!-- Button trigger modal -->
                                     <button type="submit" class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" id="update_btn">
-                                        <a href="{% url 'update_todo' i.id %}">Update</a>
-                                    </button>
-                                </div>
-
-                                <div class="float-right">
-                                    <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
-                                        <a href="{% url 'completed_todo' i.id %}">Completed</a>
+                                        <a href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">Update
+                                        </a>
                                     </button>
                                 </div>
 
                                 <div class="float-right">
                                     <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-sm btn-primary ml-1 mt-1 mr-1 mb-1">
-                                        <a href="{% url 'addTodo' i.id %}" data-toggle="modal" data-target="#staticBackdrop">
+                                    <button type="submit" class="btn btn-sm btn-primary ml-1 mt-1 mr-1 mb-1" id="addBtn">
+                                        <a href="{% url 'addTask' i.id %}" data-toggle="modal" data-target="#taskModal_{{i.id}}" name="todoObj">
                                             Add
                                         </a>                
                                     </button>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"                              aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="staticBackdropLabel">Add New Task</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
+                                </div>
+                                      
+                               <!-- Task Modal for adding tasks under todo items -->
+                                <div class="modal fade" id="taskModal_{{ i.id }}" data-backdrop="static" tabindex="-1" role="dialog" 
+                                            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabel">Add New Task</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{% url 'addTask' i.id %}" method="POST" id="addTask">
+                                                    {% csrf_token %}
+                                                    <div class="card card-body">
 
-                                                <div class="modal-body">
-                                                    <form action="{% url 'addTodo' i.id %}" method="POST">
-                                                        {% csrf_token %}
-                                                        <div class="card">
+                                                        {{ task_form.heading }}
 
-                                                            {{ task_form.heading }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-success" type="submit">Submit</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Update Todo Modal for updating Todo Items -->
+                                <div class="modal fade" id="updateTodoModal_{{ i.id }}" data-backdrop="static" tabindex="-1" role="dialog"          aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabel">Update ToDo</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
 
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-success" type="submit">Submit</button>
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
+                                            <div class="modal-body">
+                                                <form action="{% url 'update_todo' i.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="card card-body">
+
+                                                        {{ todo_form|crispy }}
+
+                                                    </div>                                     
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-success" type="submit">Submit</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 {% for j in i.tasks.all %}
-                                    {% if i.tasks.all %}
                                     {% if j.completed == False %}
                                         <div class="card mt-4">
                                             <ul class="list-group">
                                                 <li class="list-group-item list-group-item-danger" id="upcomingItem">
                                                     {{ j.heading }}
                                                     <div class="float-right">
+                                                        <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
+                                                            <a href="{% url 'completed_todo' j.id %}">Completed</a>
+                                                        </button>
+
                                                         <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
                                                             <a href="{% url 'delete_todo' j.id %}">❌</a>
                                                         </button>
                                                     </div>
 
-                                                    <div class="float-right">
-                                                        <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
-                                                            <a href="{% url 'completed_todo' j.id %}">Completed</a>
-                                                        </button>
-                                                    </div>
                                                 </li>
                                             </ul>
                                         </div>
-                                    {% endif %}
-                                    {% endif %}
+                                    {% endif %}                                   
                                 {% endfor %}
                             </li>
-
-                        {% endfor %}
-                    </ul>
+                        </ul>
+                    {% endfor %}
                     <hr/>
 
                     <ul class="pagination justify-content-center">
@@ -147,14 +175,41 @@
                                 {{ i.title }}
 
                                 <div class="float-right">
+                                    <button type="submit" class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" id="update_btn">
+                                        <a href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">Update</a>
+                                    </button>
+
+                                    <!-- Update Todo Modal for updating Todo Items -->
+                                    <div class="modal fade" id="updateTodoModal_{{i.id}}" data-backdrop="static" tabindex="-1" role="dialog"          aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel">Update ToDo</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <form action="{% url 'update_todo' i.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="card card-body">
+
+                                                            {{ todo_form|crispy }}
+
+                                                        </div>                                     
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success" type="submit">Submit</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
                                         <a href="{% url 'delete_todo' i.id %}">❌</a>
-                                    </button>
-                                </div>
-
-                                <div class="float-right">
-                                    <button type="submit" class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" id="update_btn">
-                                        <a href="{% url 'update_todo' i.id %}">Update</a>
                                     </button>
                                 </div>
 
@@ -165,14 +220,12 @@
                                             <li class="list-group-item list-group-item-danger" id="upcomingItem">
                                                 {{ j.heading }}
                                                 <div class="float-right">
-                                                    <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
-                                                        <a href="{% url 'delete_todo' j.id %}">❌</a>
-                                                    </button>
-                                                </div>
-
-                                                <div class="float-right">
                                                     <button type="submit" class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" id="completed_btn">
                                                         <a href="{% url 'completed_todo' j.id %}">Completed</a>
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">
+                                                        <a href="{% url 'delete_todo' j.id %}">❌</a>
                                                     </button>
                                                 </div>
                                             </li>

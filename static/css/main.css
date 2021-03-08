@@ -99,3 +99,8 @@ form #form-create{
 #id_todo {
 	margin-right:2px;
 }
+
+.modal{
+	text-align: center;
+	justify-content: center;
+}

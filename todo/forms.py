@@ -15,7 +15,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ['heading', 'todo', 'completed']
+        fields = ['heading', 'todo']
 
 class userRegisterForm(UserCreationForm):
     email = forms.EmailField()

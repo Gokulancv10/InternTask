@@ -72,45 +72,31 @@ def update_todo(request, pk):
 
     try:
         obj = Todo.objects.get(id=pk, user_id=request.user)
-
-        upform = TodoForm(instance=obj)
-        if request.method == 'POST':
-            upform = TodoForm(request.POST, instance=obj)
-            if upform.is_valid():
-                upform.save()
-                return redirect('/')
+        print(obj)
     except Exception as err:
+        raise Http404(err)
 
-        try:
-            obj = Task.objects.get(id=pk, user=request.user)
-            upform = TaskForm(instance=obj)
-            if request.method == 'POST':
-                upform = TaskForm(request.POST, instance=obj)
-                if upform.is_valid():
-                    upform.save()
-                    return redirect('/')
-        except Exception as err:
-            raise Http404(err)
-
-    context = {'upform': upform}
-    return render(request, 'todo/update_task.html', context)
+    upform = TodoForm(instance=obj)
+    if request.method == 'POST':
+        upform = TodoForm(request.POST, instance=obj)
+        if upform.is_valid():
+            upform.save()
+    return redirect('/')
 
 
 @login_required(login_url='login')
-def add_todo(request, pk):
+def add_task(request, pk):
 
-    obj = Todo.objects.get(id=pk, user_id=request.user)
+    try:
+        obj = Todo.objects.get(id=pk, user_id=request.user)
+    except Exception as err:
+        raise Http404(err)
 
     if request.method == 'POST':
-        if request.POST.get('heading'):
-            data = Task()
-            data.heading = request.POST.get('heading')
-            data.todo = obj
-            data.user = request.user
-            data.save()
+        Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(), 
+            todo=obj, user=request.user)
 
-    return redirect('/')
-
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='login')
 def delete_todo(request, pk):
