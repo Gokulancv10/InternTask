@@ -11,11 +11,13 @@ class TodoForm(forms.ModelForm):
         model = Todo
         fields = ['title', 'completed']
 
+
 class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
         fields = ['heading', 'todo']
+
 
 class userRegisterForm(UserCreationForm):
     email = forms.EmailField()
