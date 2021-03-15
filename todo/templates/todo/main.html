@@ -25,24 +25,24 @@
                     {% for i in page_obj %}
 
                         <ul class="list-group" id="upcomingItems">
-                            <li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
+                            <li class="list-group-item list-group-item-info mb-1" id="upcomingItem">
                                 {{ i.title }}
 
-                                <div class="float-right">                                   
-                                    <a class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" href="{% url 'completed_todo' i.id %}">
+                                <div class="float-right">                                  
+                                    <h5><a class="badge badge-dark ml-1 mt-1 mr-1" href="{% url 'completed_todo' i.id %}">
                                         Completed
                                     </a>
                                                                         
-                                    <a class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1" href="{% url 'delete_todo' i.id %}">
+                                    <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_todo' i.id %}">
                                         ❌
-                                    </a>                                  
+                                    </a></h5>                              
                                 </div>
 
                                 <div class="float-right">
                                     <!-- Button trigger modal for update todo-->                                   
-                                    <a class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">
+<!--                                     <h5><a class="badge badge-success ml-1 mt-1 mr-1" href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">
                                         Update
-                                    </a>
+                                    </a></h5> -->
                                     
                                     <!-- Update Todo Modal for updating Todo Items -->
                                     <div class="modal fade" id="updateTodoModal_{{ i.id }}" data-backdrop="static" tabindex="-1" role="dialog"          aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -75,9 +75,9 @@
 
                                 <div class="float-right">
                                     <!-- Button trigger modal for adding tasks-->                                 
-                                    <a class="btn btn-sm btn-primary ml-1 mt-1 mr-1 mb-1" href="{% url 'addTask' i.id %}" data-toggle="modal" data-target="#taskModal_{{i.id}}" name="todoObj">
+                                    <h5><a class="badge badge-primary ml-1 mt-1 mr-1 mb-1" href="{% url 'addTask' i.id %}" data-toggle="modal" data-target="#taskModal_{{i.id}}" name="todoObj">
                                         Add
-                                    </a>                
+                                    </a></h5>            
                                     
                                     <!-- Task Modal for adding tasks under todo items -->
                                     <div class="modal fade" id="taskModal_{{ i.id }}" data-backdrop="static" tabindex="-1" role="dialog" 
@@ -109,19 +109,18 @@
                                     </div>                                     
                                 </div>    
                                 {% for j in i.tasks.all %}                                                             
-
                                     {% if j.completed == False %}
-                                        <div class="card mt-4">
+                                        <div class="card mt-3">
                                             <ul class="list-group">
                                                 <li class="list-group-item list-group-item-danger" id="upcomingItem">
                                                     {{ j.heading }}
                                                     <div class="float-right">                                      
-                                                        <a class="btn btn-sm btn-dark ml-1 mt-1 mr-1 mb-1" href="{% url 'completed_task' j.id %}">
+                                                        <h5><a class="badge badge-dark ml-1 mr-1" href="{% url 'completed_task' j.id %}">
                                                             Completed
-                                                        </a>                                                     
+                                                        </a>                                                
                                                         
-                                                        <a class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1" href="{% url 'delete_task' j.id %}">   ❌
-                                                        </a>                                                      
+                                                        <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_task' j.id %}">   ❌
+                                                        </a></h5>                                                    
                                                     </div>
                                                 </li>
                                             </ul>
@@ -131,8 +130,8 @@
                             </li>
                         </ul>
                     {% endfor %}
-                    <hr/>
 
+                    <hr>
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
@@ -162,14 +161,18 @@
                  
                     <ul class="list-group" id="upcomingItems">
                         {% for i in page_obj2 %}
-                            <li class="list-group-item list-group-item-primary mb-1" id="upcomingItem">
+                            <li class="list-group-item list-group-item-warning mb-1" id="upcomingItem">
                                 {{ i.title }}
 
                                 <div class="float-right">
                                     
-                                    <a class="btn btn-sm btn-success ml-1 mt-1 mr-1 mb-1" href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">
+<!--                                     <h5><a class="badge badge-success ml-1 mt-1 mr-1" href="{% url 'update_todo' i.id %}" data-toggle="modal" data-target="#updateTodoModal_{{i.id}}">
                                         Update
-                                    </a>
+                                    </a> -->
+
+                                    <h5><a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_todo' i.id %}" class="btn btn-sm btn-danger ml-1 mt-1 mr-1">
+                                        ❌
+                                    </a></h5>
                                     
                                     <!-- Update Todo Modal for updating Todo Items -->
                                     <div class="modal fade" id="updateTodoModal_{{i.id}}" data-backdrop="static" tabindex="-1" role="dialog"          aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -198,19 +201,18 @@
                                         </div>
                                     </div>
 
-                                    <a class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1" href="{% url 'delete_todo' i.id %}" class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1">❌</a>
                                 </div>
 
                                 {% for j in i.tasks.all %}
                                     {% if j.completed == True %}
                                         <div class="card mt-4">
                                             <ul class="list-group">
-                                                <li class="list-group-item list-group-item-warning" id="completedItem">
+                                                <li class="list-group-item list-group-item-dark" id="completedItem">
                                                     {{ j.heading }}
                                                     <div class="float-right">                                                      
-                                                        <a class="btn btn-sm btn-danger ml-1 mt-1 mr-1 mb-1" href="{% url 'delete_task' j.id %}">
+                                                        <h5><a class="badge badge-warning ml-1 mr-1" href="{% url 'delete_task' j.id %}">
                                                             ❌
-                                                        </a>
+                                                        </a></h5>
                                                     </div>
                                                 </li>
                                             </ul>

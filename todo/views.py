@@ -56,6 +56,7 @@ def home(request):
             data = todo_form1.cleaned_data.get('title')
             obj = Todo.objects.create(
                 date_created=timezone.now(), title=data, user_id=request.user)
+        return redirect('/')
 
     context = {'todo_form': todo_form, 'page_obj': page_obj, 'page_obj2': page_obj2,
                'pagi1': pagi1, 'pagi2': pagi2, 'page_num2': int(page_num2), 'page_num': int(page_num), 'task_form': task_form}
@@ -95,6 +96,8 @@ def delete(request, pk):
 
     try:
         obj = Todo.objects.get(id=pk, user_id=request.user)
+        for task in obj.tasks.all():
+            task.delete()
     except Exception as err:
         try:
             obj = Task.objects.get(id=pk, user=request.user)
@@ -108,13 +111,24 @@ def delete(request, pk):
 def completed(request, pk):
 
     try:
-        obj = Todo.objects.get(id=pk, user_id=request.user)
+        todo = Todo.objects.get(id=pk, user_id=request.user)
+        for task in todo.tasks.filter(completed=False):
+            task.completed = True
+            task.save()
+        todo.completed = True
+        todo.save()
     except Exception as err:
         try:
-            obj = Task.objects.get(id=pk, user=request.user)
+            task = Task.objects.get(id=pk, user=request.user)
+            task.completed = True
+            task.save()            
+            print(task.todo.tasks.filter(completed=True))
+            if len(task.todo.tasks.filter(completed=False)) == 0:
+                task.todo.completed = True
+                task.todo.save()
+                print(f'{task.todo} moved to completed list')
+
         except Exception as err:
             raise Http404(err)
 
-    obj.completed = True
-    obj.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
