@@ -125,6 +125,21 @@
                                                 </li>
                                             </ul>
                                         </div>
+
+                                    {% else %}
+                                        <div class="card mt-3">
+                                            <ul class="list-group">
+                                                <li class="list-group-item list-group-item-warning" id="upcomingItem">
+                                                    {{ j.heading }}
+                                                    <div class="float-right">                                      
+                                                        <h5>                                                                                    
+                                                            <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_task' j.id %}">   ❌
+                                                            </a>
+                                                        </h5>                                                    
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>                                    
                                     {% endif %}
                                 {% endfor %}                                   
                             </li>

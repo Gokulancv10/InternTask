@@ -28,9 +28,11 @@ def register(request):
     context = {'form': form}
     return render(request, 'todo/register.html', context)
 
+
 def logoutUser(request):
     logout(request)
     return redirect('login')
+
 
 @login_required(login_url='login')
 def home(request):
@@ -62,6 +64,7 @@ def home(request):
                'pagi1': pagi1, 'pagi2': pagi2, 'page_num2': int(page_num2), 'page_num': int(page_num), 'task_form': task_form}
     return render(request, 'todo/main.html', context)
 
+
 @login_required(login_url='login')
 def update_todo(request, pk):
 
@@ -78,6 +81,7 @@ def update_todo(request, pk):
             upform.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
 @login_required(login_url='login')
 def add_task(request, pk):
 
@@ -91,44 +95,64 @@ def add_task(request, pk):
             todo=obj, user=request.user)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-@login_required(login_url='login')
-def delete(request, pk):
-
-    try:
-        obj = Todo.objects.get(id=pk, user_id=request.user)
-        for task in obj.tasks.all():
-            task.delete()
-    except Exception as err:
-        try:
-            obj = Task.objects.get(id=pk, user=request.user)
-        except Exception as err:
-            raise Http404(err)
-
-    obj.delete()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required(login_url='login')
-def completed(request, pk):
+def delete_todo(request, pk):
 
     try:
         todo = Todo.objects.get(id=pk, user_id=request.user)
-        for task in todo.tasks.filter(completed=False):
-            task.completed = True
-            task.save()
-        todo.completed = True
-        todo.save()
     except Exception as err:
-        try:
-            task = Task.objects.get(id=pk, user=request.user)
-            task.completed = True
-            task.save()            
-            print(task.todo.tasks.filter(completed=True))
-            if len(task.todo.tasks.filter(completed=False)) == 0:
-                task.todo.completed = True
-                task.todo.save()
-                print(f'{task.todo} moved to completed list')
+        raise Http404(err)
 
-        except Exception as err:
-            raise Http404(err)
+    for task in todo.tasks.all():
+        task.delete()
+    todo.delete()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required(login_url='login')
+def delete_task(request, pk):
+
+    try:
+        task = Task.objects.get(id=pk, user=request.user)
+    except Exception as err:
+        raise Http404(err)
+
+    task.delete()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required(login_url='login')
+def completed_todo(request, pk):
+
+    try:
+        todo = Todo.objects.get(id=pk, user_id=request.user)
+    except Exception as err:
+        raise Http404(err)
+
+    for task in todo.tasks.filter(completed=False):
+        task.completed = True
+        task.save()
+    todo.completed = True
+    todo.save()
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required(login_url='login')
+def completed_task(request, pk):
+
+    try:
+        task = Task.objects.get(id=pk, user=request.user)
+    except Exception as err:
+        raise Http404(err)
+
+    task.completed = True
+    task.save()            
+    print(task.todo.tasks.filter(completed=True))
+    if len(task.todo.tasks.filter(completed=False)) == 0:
+        task.todo.completed = True
+        task.todo.save()
+        print(f'{task.todo} moved to completed list')
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
