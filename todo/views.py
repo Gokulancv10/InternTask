@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 
 
 def register(request):
@@ -83,6 +84,7 @@ def update_todo(request, pk):
 
 
 @login_required(login_url='login')
+@require_POST
 def add_task(request, pk):
 
     try:
@@ -90,8 +92,7 @@ def add_task(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    if request.method == 'POST':
-        Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(), 
+    Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(), 
             todo=obj, user=request.user)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -104,8 +105,7 @@ def delete_todo(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    for task in todo.tasks.all():
-        task.delete()
+    todo.tasks.all().delete()
     todo.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -129,13 +129,9 @@ def completed_todo(request, pk):
         todo = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
         raise Http404(err)
-
-    for task in todo.tasks.filter(completed=False):
-        task.completed = True
-        task.save()
     todo.completed = True
-    todo.save()
-
+    todo.tasks.filter(completed=False).update(completed=True)
+    todo.save()  
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -150,9 +146,8 @@ def completed_task(request, pk):
     task.completed = True
     task.save()            
     print(task.todo.tasks.filter(completed=True))
-    if len(task.todo.tasks.filter(completed=False)) == 0:
+    if task.todo.tasks.filter(completed=False).count() == 0:
         task.todo.completed = True
         task.todo.save()
-        print(f'{task.todo} moved to completed list')
 
     return redirect(request.META.get('HTTP_REFERER', '/'))

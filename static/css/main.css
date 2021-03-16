@@ -1,6 +1,5 @@
 
 input {
-	width: 80%;
 	padding: 6px 20px;
 	margin: 8px 0;
 	box-sizing: border-box;
@@ -23,7 +22,7 @@ input::placeholder {
 }
 
 .center-column{
-	width: 98%;
+	width: 60%;
 	margin: 10px;
 	padding: 10px;
 	border-radius: 3px;
