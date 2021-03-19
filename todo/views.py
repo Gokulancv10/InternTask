@@ -37,11 +37,13 @@ def logoutUser(request):
 
 @login_required(login_url='login')
 def home(request):
-    
+
     task_form = TaskForm()
 
-    todo_items_upcoming = Todo.objects.filter(user_id=request.user, completed=False).order_by('-date_created')
-    todo_items_completed = Todo.objects.filter(user_id=request.user, completed=True).order_by('-date_created')
+    todo_items_upcoming = Todo.objects.filter(
+        user_id=request.user, completed=False).order_by('-date_created')
+    todo_items_completed = Todo.objects.filter(
+        user_id=request.user, completed=True).order_by('-date_created')
 
     pagi1 = Paginator(todo_items_upcoming, 4)
     pagi2 = Paginator(todo_items_completed, 4)
@@ -57,7 +59,7 @@ def home(request):
         todo_form1 = TodoForm(request.POST)
         if todo_form1.is_valid():
             data = todo_form1.cleaned_data.get('title')
-            obj = Todo.objects.create(
+            Todo.objects.create(
                 date_created=timezone.now(), title=data, user_id=request.user)
         return redirect('/')
 
@@ -67,19 +69,17 @@ def home(request):
 
 
 @login_required(login_url='login')
+@require_POST
 def update_todo(request, pk):
 
     try:
         obj = Todo.objects.get(id=pk, user_id=request.user)
-        print(obj)
     except Exception as err:
         raise Http404(err)
 
-    upform = TodoForm(instance=obj)
-    if request.method == 'POST':
-        upform = TodoForm(request.POST, instance=obj)
-        if upform.is_valid():
-            upform.save()
+    obj.title = request.POST.get('title')
+    obj.save()
+
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -92,8 +92,8 @@ def add_task(request, pk):
     except Exception as err:
         raise Http404(err)
 
-    Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(), 
-            todo=obj, user=request.user)
+    Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(),
+                        todo=obj, user=request.user)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -129,9 +129,9 @@ def completed_todo(request, pk):
         todo = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
         raise Http404(err)
-    todo.completed = True
     todo.tasks.filter(completed=False).update(completed=True)
-    todo.save()  
+    todo.completed = True
+    todo.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -144,10 +144,8 @@ def completed_task(request, pk):
         raise Http404(err)
 
     task.completed = True
-    task.save()            
-    print(task.todo.tasks.filter(completed=True))
+    task.save()
     if task.todo.tasks.filter(completed=False).count() == 0:
         task.todo.completed = True
         task.todo.save()
-
     return redirect(request.META.get('HTTP_REFERER', '/'))
