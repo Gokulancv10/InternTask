@@ -1,58 +1,48 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, Http404, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
-from .models import Todo, Task
-from .forms import *
+from django.shortcuts import render, redirect
+from django.http import Http404, HttpResponse
 from django.utils import timezone
-from django.contrib.auth.forms import UserCreationForm
-from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from .models import Todo, Task
+from .forms import TodoForm, TaskForm, UserRegisterForm
 
 
 def register(request):
-
-    form = userRegisterForm()
+    form = UserRegisterForm()
     if request.method == 'POST':
-        form = userRegisterForm(request.POST)
+        form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password2')
             return redirect('login')
     else:
-        form = userRegisterForm()
-
+        form = UserRegisterForm()
     context = {'form': form}
     return render(request, 'todo/register.html', context)
 
 
-def logoutUser(request):
+def logout_user(request):
     logout(request)
     return redirect('login')
 
 
 @login_required(login_url='login')
 def home(request):
-
     task_form = TaskForm()
-
     todo_items_upcoming = Todo.objects.filter(
         user_id=request.user, completed=False).order_by('-date_created')
     todo_items_completed = Todo.objects.filter(
         user_id=request.user, completed=True).order_by('-date_created')
-
-    pagi1 = Paginator(todo_items_upcoming, 4)
-    pagi2 = Paginator(todo_items_completed, 4)
-
-    page_num = request.GET.get('upcoming', 1)
-    page_num2 = request.GET.get('completed', 1)
-
-    page_obj = pagi1.get_page(page_num)
-    page_obj2 = pagi2.get_page(page_num2)
+    
+    pagination_upcoming = Paginator(todo_items_upcoming, 4)
+    pagination_completed = Paginator(todo_items_completed, 4)
+    
+    page_upcoming = request.GET.get('upcoming', 1)
+    page_completed = request.GET.get('completed', 1)
+    
+    page_data_upcoming = pagination_upcoming.get_page(page_upcoming)
+    page_data_completed = pagination_completed.get_page(page_completed)
 
     todo_form = TodoForm()
     if request.method == "POST":
@@ -62,49 +52,66 @@ def home(request):
             Todo.objects.create(
                 date_created=timezone.now(), title=data, user_id=request.user)
         return redirect('/')
-
-    context = {'todo_form': todo_form, 'page_obj': page_obj, 'page_obj2': page_obj2,
-               'pagi1': pagi1, 'pagi2': pagi2, 'page_num2': int(page_num2), 'page_num': int(page_num), 'task_form': task_form}
+    context = {
+        'todo_form': todo_form,
+        'page_obj': page_data_upcoming,
+        'page_obj2': page_data_completed,
+        'pagi1': pagination_upcoming,
+        'pagi2': pagination_completed,
+        'page_num2': int(page_completed),
+        'page_num': int(page_upcoming),
+        'task_form': task_form
+    }
     return render(request, 'todo/main.html', context)
 
 
 @login_required(login_url='login')
 @require_POST
 def update_todo(request, pk):
-
     try:
         obj = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
         raise Http404(err)
-
     obj.title = request.POST.get('title')
+    for task in obj.tasks.all():
+        result = Task.objects.get(id=task.id)
+        result.heading = request.POST.get('heading_'+str(task.id))
+        result.save()
     obj.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
+@login_required(login_url='login')
+@require_POST
+def update_task(request, pk):
+    try:
+        obj = Task.objects.get(id=pk, user=request.user)
+    except Exception as err:
+        raise Http404(err)
+    obj.heading = request.POST.get('heading')
+    obj.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required(login_url='login')
 @require_POST
 def add_task(request, pk):
-
     try:
         obj = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
         raise Http404(err)
-
-    Task.objects.create(heading=request.POST.get('heading'), date_created=timezone.now(),
-                        todo=obj, user=request.user)
+    obj = Task.objects.create(heading=request.POST.get(
+        'heading'), date_created=timezone.now(), todo=obj, user=request.user)
+    print(obj)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required(login_url='login')
 def delete_todo(request, pk):
-
     try:
         todo = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
         raise Http404(err)
-
     todo.tasks.all().delete()
     todo.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -112,19 +119,16 @@ def delete_todo(request, pk):
 
 @login_required(login_url='login')
 def delete_task(request, pk):
-
     try:
         task = Task.objects.get(id=pk, user=request.user)
     except Exception as err:
         raise Http404(err)
-
     task.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required(login_url='login')
 def completed_todo(request, pk):
-
     try:
         todo = Todo.objects.get(id=pk, user_id=request.user)
     except Exception as err:
@@ -137,12 +141,10 @@ def completed_todo(request, pk):
 
 @login_required(login_url='login')
 def completed_task(request, pk):
-
     try:
         task = Task.objects.get(id=pk, user=request.user)
     except Exception as err:
         raise Http404(err)
-
     task.completed = True
     task.save()
     if task.todo.tasks.filter(completed=False).count() == 0:

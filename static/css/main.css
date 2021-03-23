@@ -1,14 +1,15 @@
 
-input {
-	width: 90%;
+#id_title {
+	width: 300%;
 	padding: 6px 20px;
 	margin: 8px 0;
 	box-sizing: border-box;
 	height: 40px;
 }
 
-input::placeholder {
-  color: #d3d3d3;
+#addTodobtn{
+	margin: 7px 0px 0px 5px;
+	height: 42px;
 }
 
 .submit{
@@ -41,7 +42,7 @@ a:link{
 }
 
 hr{
-	border-top: 1px solid black;
+	border-top: .5px solid black;
 }
 
 #id_completed{
@@ -61,10 +62,6 @@ hr{
 .btn-danger{
 	background-color: #ffae19;
 	border-color: #e59400;
-}
-
-a{
-	color: white;
 }
 
 .user{
@@ -96,11 +93,14 @@ form #form-create{
 	border-radius: 2px;
 }
 
-#id_todo {
-	margin-right:2px;
+#update_todo,
+#update_task{
+	font-size: large;
+	height:30px;
 }
 
-.modal{
-	text-align: center;
+#update_task_list,
+#update_todo_list{
+	max-width: max-content;
 	justify-content: center;
 }
