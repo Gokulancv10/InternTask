@@ -60,7 +60,9 @@ def home(request):
         'pagi2': pagination_completed,
         'page_num2': int(page_completed),
         'page_num': int(page_upcoming),
-        'task_form': task_form
+        'task_form': task_form,
+        'todo_items_upcoming':len(todo_items_upcoming),
+        'todo_items_completed':len(todo_items_completed)
     }
     return render(request, 'todo/main.html', context)
 

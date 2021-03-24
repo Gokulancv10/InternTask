@@ -161,28 +161,30 @@
                     </li>
                 </ul>
                 {% endfor %}
-                <hr />
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                    <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-                        <a class="page-link"
-                            href="?upcoming={{ page_obj.previous_page_number }}&completed={{ page_num2 }}">&laquo</a>
-                    </li>
-                    {% endif %}
+                {% if todo_items_upcoming > 4 %}
+                    <hr>
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+                            <a class="page-link"
+                                href="?upcoming={{ page_obj.previous_page_number }}&completed={{ page_num2 }}">&laquo</a>
+                        </li>
+                        {% endif %}
 
-                    {% for i in pagi1.page_range %}
-                    <li class="page-item {% if i == page_num %} active {% endif %}">
-                        <a class="page-link" href="?upcoming={{ i }}&completed={{ page_num2 }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
+                        {% for i in pagi1.page_range %}
+                        <li class="page-item {% if i == page_num %} active {% endif %}">
+                            <a class="page-link" href="?upcoming={{ i }}&completed={{ page_num2 }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
 
-                    {% if page_obj.has_next %}
-                    <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-                        <a class="page-link"
-                            href="?upcoming={{ page_obj.next_page_number }}&completed={{ page_num2 }}">&raquo</a>
-                    </li>
-                    {% endif %}
-                </ul>
+                        {% if page_obj.has_next %}
+                        <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+                            <a class="page-link"
+                                href="?upcoming={{ page_obj.next_page_number }}&completed={{ page_num2 }}">&raquo</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -221,28 +223,30 @@
                     </li>
                 </ul>
                 {% endfor %}
+                {% if todo_items_completed > 4 %}
+                    <hr>
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj2.has_previous %}
+                        <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+                            <a class="page-link"
+                                href="?completed={{ page_obj2.previous_page_number }}&upcoming={{ page_num }}">&laquo</a>
+                        </li>
+                        {% endif %}
 
-                <ul class="pagination justify-content-center">
-                    {% if page_obj2.has_previous %}
-                    <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-                        <a class="page-link"
-                            href="?completed={{ page_obj2.previous_page_number }}&upcoming={{ page_num }}">&laquo</a>
-                    </li>
-                    {% endif %}
+                        {% for i in pagi2.page_range %}
+                        <li class="page-item {% if i == page_num2 %} active {% endif %}">
+                            <a class="page-link" href="?completed={{ i }}&upcoming={{ page_num }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
 
-                    {% for i in pagi2.page_range %}
-                    <li class="page-item {% if i == page_num2 %} active {% endif %}">
-                        <a class="page-link" href="?completed={{ i }}&upcoming={{ page_num }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
-
-                    {% if page_obj2.has_next %}
-                    <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-                        <a class="page-link"
-                            href="?completed={{ page_obj2.next_page_number }}&upcoming={{ page_num }}">&raquo</a>
-                    </li>
-                    {% endif %}
-                </ul>
+                        {% if page_obj2.has_next %}
+                        <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+                            <a class="page-link"
+                                href="?completed={{ page_obj2.next_page_number }}&upcoming={{ page_num }}">&raquo</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
             </div>
         </div>
     </div>
