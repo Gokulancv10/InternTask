@@ -102,7 +102,6 @@ def add_task(request, pk):
         raise Http404(err)
     obj = Task.objects.create(heading=request.POST.get(
         'heading'), date_created=timezone.now(), todo=obj, user=request.user)
-    print(obj)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 

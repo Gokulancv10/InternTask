@@ -102,5 +102,5 @@ form #form-create{
 #update_task_list,
 #update_todo_list{
 	max-width: max-content;
-	justify-content: center;
+	/* justify-content: center; */
 }
