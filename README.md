@@ -1,1 +1,3 @@
-# InternTask
+# To-Do Application
+
+![To-do App](Todo-App_demo.gif)
