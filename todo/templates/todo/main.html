@@ -1,42 +1,48 @@
 {% extends 'todo/index.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="center-column">
-    <h5 class="card-title">Create your List</h5>
-    <form action="" method="POST" id="addTodoForm">
+<div class="center-column" id="center-column">
+    <h5 class="card-title">Hello {{ request.user.username|capfirst }}, Create your todo list's</h5>
+    <form action="{% url 'home' %}" method="POST" id="addTodoForm">
         {% csrf_token %}
         <div class="input-group-append">
             {{ todo_form.title }}
             <button type="submit" class="form-control btn btn-primary mr-sm-2" id="addTodobtn">
-                Add Items
+                Add Item
             </button>
         </div>
     </form>
 </div>
-<div class="row">
-    <div class="col-sm-6">
+<div class="row" id="row">
+    {% if todo_items_upcoming %}
+    <div class="col-sm-5">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Upcoming Items</h4>
+                <h5 class="card-title">
+                    Incomplete Todo Item{{ todo_items_upcoming|pluralize }}
+                </h5>
                 <hr />
                 {% for i in page_obj %}
                 <ul class="list-group" id="upcomingItems">
                     <li class="list-group-item list-group-item-info mb-1" id="upcomingItem">
                         {{ i.title }}
-
                         <div class="float-right">
                             <h5>
-                                <a class="badge badge-light ml-1 mt-1 mr-1"
-                                    href="{% url 'completed_todo' i.id %}">&#10004;</a>
-                                <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_todo' i.id %}">❌</a>
+                                <a class="badge badge-light"
+                                    href="{% url 'completed_todo' i.id %}">
+                                    &#10004;
+                                </a>
+                                <a class="badge badge-warning ml-1" href="{% url 'delete_todo' i.id %}">
+                                    ❌
+                                </a>
                             </h5>
                         </div>
                         <div class="float-right">
                             <!-- Button trigger modal for update todo-->
-                            <h5>
-                                <a class="badge badge-success ml-1 mt-1 mr-1" href="{% url 'update_todo' i.id %}"
-                                    data-toggle="modal" data-target="#updateTodoModal_{{ i.id }}">Update</a>
-                            </h5>
+                            <a class="fa fa-edit mt-1 ml-1 mr-1" href="{% url 'update_todo' i.id %}"
+                                data-toggle="modal" data-target="#updateTodoModal_{{ i.id }}" style="font-size:24px;color:black;">
+                                <!-- <i class="fa fa-edit"></i> -->
+                            </a>
                             <!-- Update Todo Modal for updating Todo Items -->
                             <div class="modal fade" id="updateTodoModal_{{ i.id }}" tabindex="-1" role="dialog"
                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -52,18 +58,19 @@
                                             <form action="{% url 'update_todo' i.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <li class="list-group-item list-group-item-warning mb-1" id="update_todo_list">
-                                                    <input type="text" value="{{ i.title }}" name="title" id="update_todo" size="45"/>
+                                                    <input type="text" value="{{ i.title }}" name="title" id="update_todo" size="40"/>
                                                 </li>
                                                 
                                                 {% if i.tasks.all %}
                                                     <hr>
-                                                    <h5 class="modal-title mb-1" id="task-title">Update Task Item{{i.tasks.count|pluralize}}</h5>
+                                                    <h5 class="modal-title mb-1" id="task-title">
+                                                        Update Task Item{{ i.tasks.count|pluralize }}</h5>
                                                 {% endif %}
 
                                                 {% for j in i.tasks.all %}
                                                     <li class="list-group-item list-group-item-dark mb-1" id="update_task_list">
                                                         <input class="mb-1" type="text" value="{{ j.heading }}" name="heading_{{ j.id }}"
-                                                        id="update_task" size="45"/>
+                                                        id="update_task" size="40"/>
                                                     </li>
                                                 {% endfor %}
                                                 <div class="modal-footer">
@@ -77,10 +84,10 @@
                         </div>
                         <div class="float-right">
                             <!-- Button trigger modal for adding tasks-->
-                            <a class="badge badge-primary ml-1 mt-1 mr-1 mb-1" href="{% url 'addTask' i.id %}"
+                            <h5><a class="badge badge-primary mr-1" href="{% url 'addTask' i.id %}"
                                 data-toggle="modal" data-target="#addnewTaskModal_{{ i.id }}" name="addTask">
                                 &#x271A;
-                            </a>
+                            </a></h5>
                             <!-- Task Modal for adding tasks under todo items -->
                             <div class="modal fade" id="addnewTaskModal_{{ i.id }}" data-backdrop="static" tabindex="-1"
                                 role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -127,13 +134,13 @@
                                     </div>
                                     <div class="float-right">
                                         <h5>
-                                            <a class="badge badge-dark ml-1 mr-1"
+                                            <a class="badge badge-light mr-1"
                                                 href="{% url 'completed_task' j.id %}">
-                                                Completed
+                                                &#10004;
                                             </a>
 
                                             <!-- Delete Task Function -->
-                                            <a class="badge badge-warning ml-1 mt-1 mr-1"
+                                            <a class="badge badge-warning mt-1 mr-1"
                                                 href="{% url 'delete_task' j.id %}">❌</a>
                                         </h5>
                                     </div>
@@ -141,7 +148,7 @@
                             </ul>
                         </div>
                         {% else %}
-                        <div class="card mb-1">
+                        <div class="card mt-3">
                             <ul class="list-group">
                                 <li class="list-group-item list-group-item-warning" id="upcomingItem">
                                     <div class="float-left">
@@ -161,94 +168,38 @@
                     </li>
                 </ul>
                 {% endfor %}
+                
                 {% if todo_items_upcoming > 4 %}
                     <hr>
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
-                        <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-                            <a class="page-link"
-                                href="?upcoming={{ page_obj.previous_page_number }}&completed={{ page_num2 }}">&laquo</a>
-                        </li>
+                            <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+                                <a class="page-link"
+                                    href="?upcoming={{ page_obj.previous_page_number }}&completed={{ page_num2 }}">&laquo</a>
+                            </li>
                         {% endif %}
 
                         {% for i in pagi1.page_range %}
-                        <li class="page-item {% if i == page_num %} active {% endif %}">
-                            <a class="page-link" href="?upcoming={{ i }}&completed={{ page_num2 }}">{{ i }}</a>
-                        </li>
+                            <li class="page-item {% if i == page_num %} active {% endif %}">
+                                <a class="page-link" href="?upcoming={{ i }}&completed={{ page_num2 }}">{{ i }}</a>
+                            </li>
                         {% endfor %}
 
                         {% if page_obj.has_next %}
-                        <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
-                            <a class="page-link"
-                                href="?upcoming={{ page_obj.next_page_number }}&completed={{ page_num2 }}">&raquo</a>
-                        </li>
+                            <li class="page-item {% if page_obj.page_number == page_num %} active {% endif %}">
+                                <a class="page-link"
+                                    href="?upcoming={{ page_obj.next_page_number }}&completed={{ page_num2 }}">&raquo</a>
+                            </li>
                         {% endif %}
                     </ul>
                 {% endif %}
             </div>
         </div>
     </div>
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Completed Items</h4>
-                <hr>
-                {% for i in page_obj2 %}
-                <ul class="list-group" id="upcomingItems">
-                    <li class="list-group-item list-group-item-warning mb-1" id="upcomingItem">
-                        {{ i.title }}
-                        <div class="float-right">
-                            <h5>
-                                <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_todo' i.id %}"
-                                    class="btn btn-sm btn-danger ml-1 mt-1 mr-1">❌</a>
-                            </h5>
-                        </div>
-                        {% for j in i.tasks.all %}
-                        {% if j.completed == True %}
-                        <div class="card mt-4">
-                            <ul class="list-group">
-                                <li class="list-group-item list-group-item-dark" id="completedItem">
-                                    {{ j.heading }}
-                                    <div class="float-right">
-                                        <h5>
-                                            <a class="badge badge-warning ml-1 mr-1"
-                                                href="{% url 'delete_task' j.id %}">❌</a>
-                                        </h5>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                    </li>
-                </ul>
-                {% endfor %}
-                {% if todo_items_completed > 4 %}
-                    <hr>
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj2.has_previous %}
-                        <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-                            <a class="page-link"
-                                href="?completed={{ page_obj2.previous_page_number }}&upcoming={{ page_num }}">&laquo</a>
-                        </li>
-                        {% endif %}
+    {% endif %}
 
-                        {% for i in pagi2.page_range %}
-                        <li class="page-item {% if i == page_num2 %} active {% endif %}">
-                            <a class="page-link" href="?completed={{ i }}&upcoming={{ page_num }}">{{ i }}</a>
-                        </li>
-                        {% endfor %}
-
-                        {% if page_obj2.has_next %}
-                        <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
-                            <a class="page-link"
-                                href="?completed={{ page_obj2.next_page_number }}&upcoming={{ page_num }}">&raquo</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+    {% if todo_items_completed %}
+        {% include 'todo/completed_items.html' %}
+    {% endif %}
 </div>
 {% endblock %}

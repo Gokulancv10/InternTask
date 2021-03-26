@@ -1,0 +1,66 @@
+
+<div class="col-sm-5">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+                Completed Item{{ todo_items_completed|pluralize }}
+            </h5>
+            <hr>
+            {% for i in page_obj2 %}
+            <ul class="list-group" id="upcomingItems">
+                <li class="list-group-item list-group-item-warning mb-1" id="upcomingItem">
+                    {{ i.title }}
+                    <div class="float-right">
+                        <h5>
+                            <a class="badge badge-warning ml-1 mt-1 mr-1" href="{% url 'delete_todo' i.id %}"
+                                class="btn btn-sm btn-danger ml-1 mt-1 mr-1">❌</a>
+                        </h5>
+                    </div>
+                    {% for j in i.tasks.all %}
+                        {% if j.completed == True %}
+                            <div class="card mt-3">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-dark" id="completedItem">
+                                        {{ j.heading }}
+                                        <div class="float-right">
+                                            <h5>
+                                                <a class="badge badge-warning ml-1 mr-1"
+                                                    href="{% url 'delete_task' j.id %}">❌</a>
+                                            </h5>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </li>
+            </ul>
+            {% endfor %}
+
+            {% if todo_items_completed > 4 %}
+            <hr>
+            <ul class="pagination justify-content-center">
+                {% if page_obj2.has_previous %}
+                    <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+                        <a class="page-link"
+                            href="?completed={{ page_obj2.previous_page_number }}&upcoming={{ page_num }}">&laquo</a>
+                    </li>
+                {% endif %}
+
+                {% for i in pagi2.page_range %}
+                    <li class="page-item {% if i == page_num2 %} active {% endif %}">
+                        <a class="page-link" href="?completed={{ i }}&upcoming={{ page_num }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+
+                {% if page_obj2.has_next %}
+                    <li class="page-item {% if page_obj2.page_number == page_num %} active {% endif %}">
+                        <a class="page-link"
+                            href="?completed={{ page_obj2.next_page_number }}&upcoming={{ page_num }}">&raquo</a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
