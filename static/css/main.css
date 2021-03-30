@@ -1,116 +1,84 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
 #id_title {
-	width: 300%;
-	padding: 6px 20px;
-	margin: 8px 0;
-	box-sizing: border-box;
-	height: 40px;
+    width: 300%;
+    padding: 6px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    height: 40px;
+}
+
+#update_modal {
+    font-size: 24px;
+    color: black;
 }
 
 #addItem {
-	width: 20%;
-	padding: 6px 20px;
-	margin: 8px 3px;
-	height: 40px;
+    width: 20%;
+    padding: 6px 20px;
+    margin: 8px 3px;
+    height: 40px;
+}
+
+#addTaskinput {
+    width: 90%;
 }
 
 #row {
-	position: relative;
-	justify-content: center;
+    position: relative;
+    justify-content: center;
 }
 
 #addTodobtn {
-	margin: 7px 0px 0px 5px;
-	height: 42px;
-	font-size: 20px;
-}
-
-.submit {
-	background-color: #6BA3E8;
+    margin: 7px 0px 0px 5px;
+    height: 42px;
+    font-size: 20px;
 }
 
 .center-column {
-	width: 83%;
-	margin: 10px auto;
-	padding: 10px;
-	border-radius: 3px;
-	box-shadow: 6px 2px 30px 0px rgba(0, 0, 0, 0.75);
-	position: relative;
-	justify-content: center;
-}
-
-a:link {
-	color: white;
+    width: 83%;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 3px;
+    box-shadow: 6px 2px 30px 0px rgba(0, 0, 0, 0.75);
+    position: relative;
+    justify-content: center;
 }
 
 .card-body {
-	border-radius: 3px;
-	box-shadow: 3px 3px 20px 0px rgba(0, 0, 0, 0.75);
-	justify-self: center;
+    border-radius: 3px;
+    box-shadow: 3px 3px 20px 0px rgba(0, 0, 0, 0.75);
+    justify-self: center;
 }
 
 hr {
-	border-top: .5px solid black;
-}
-
-#id_completed {
-	border: 2px solid black;
-}
-
-.item-row {
-	background-color: #906abd;
-	margin: 10px;
-	padding: 10px;
-	border-radius: 3px;
-	color: #fff;
-	font-size: 16px;
-	box-shadow: 0px -1px 10px -4px rgba(0, 0, 0, 0.75);
-}
-
-.btn-danger {
-	background-color: #ffae19;
-	border-color: #e59400;
-}
-
-.user {
-	color: white;
+    border-top: .5px solid black;
 }
 
 h3,
 h4,
 h2,
 h5 {
-	text-align: center;
-}
-
-.update_todo {
-	margin: 0 auto;
-	float: none;
-	width: 70%;
-	text-align: center;
-	justify-content: center;
-}
-
-.container {
-	margin-top: 1%;
-}
-
-form #form-create {
-	text-align: center;
+    text-align: center;
 }
 
 .page-link {
-	border: 0.5px solid #3058f4;
-	border-radius: 2px;
-}
-
-#update_todo,
-#update_task {
-	font-size: large;
-	height: 30px;
+    font-size: 15px;
+    border: 0.5px solid #3058f4;
+    border-radius: 2px;
 }
 
 #update_task_list,
 #update_todo_list {
-	max-width: max-content;
-	/* justify-content: center; */
+    width: 100%
+}
+
+#update_todoinp,
+#update_taskinp {
+    font-size: large;
+    height: 30px;
+    width: 100%;
 }
