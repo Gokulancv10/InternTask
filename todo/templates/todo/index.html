@@ -3,14 +3,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>ToDo-App</title>
-
-	<link type="text/css" rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
-	<link type="text/css" rel="stylesheet" href="{% static '/css/bootstrap.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static '/css/fontawesome.css' %}">
-	
 	<meta name="viewport" content="width=device-width", initial-scale=1, shrink-to-fit="no">
+	<title>{% block title %} ToDo-App DRF {% endblock %}</title>
+
+	<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/fontawesome.css' %}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/bsmodal.js' %}"></script>
@@ -22,13 +22,11 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>    
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 <body>
-
 	<nav class="navbar navbar-dark bg-dark">
-	    <h3 class="navbar-brand">To-Do App</h3>
+	    <h3 class="navbar-brand">To-Do App Using Django REST API</h3>
         {% if user.is_authenticated %}
         	<div class="form-inline">
             	<a class="nav-item nav-link" href="{% url 'logout' %}"><button class="btn-sm btn-primary">Logout</button></a>
@@ -40,7 +38,6 @@
 	        </div>
         {% endif %}		
 	</nav>
-
 	<div class='container mt-3'>
 		{% block content %}
 		{% endblock %}
