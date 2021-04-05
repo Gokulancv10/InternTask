@@ -1,25 +1,37 @@
 from django.urls import path
-from . import views
 from django.contrib.auth import views as auth_views
 
+from . import views
+
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('update_todo/<int:todo_id>/', views.update_todo, name='update_todo'),
-    path('completed_todo/<int:todo_id>/',
-         views.completed_todo, name="completed_todo"),
-    path('completed_task/<int:task_id>/',
-         views.completed_task, name="completed_task"),
-    path('delete_todo/<int:todo_id>/', views.delete_todo, name='delete_todo'),
-    path('delete_task/<int:task_id>/', views.delete_task, name='delete_task'),
-    path('add_task/<int:task_id>/', views.add_task, name='addTask'),
+    # path('', views.home, name='home'),
+    # path('update_todo/<int:todo_id>/', views.update_todo, name='update_todo'),
+    # path('completed_todo/<int:todo_id>/',
+    #      views.completed_todo, name="completed_todo"),
+    # path('completed_task/<int:task_id>/',
+    #      views.completed_task, name="completed_task"),
+    # path('delete_todo/<int:todo_id>/', views.delete_todo, name='delete_todo'),
+    # path('delete_task/<int:task_id>/', views.delete_task, name='delete_task'),
+    # path('add_task/<int:task_id>/', views.add_task, name='addTask'),
+
+    path('', views.list, name='home'),
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(
         template_name='todo/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(
         template_name='todo/logout.html'), name='logout'),
 
+    # All API urls
+    path('api/', views.apiOverview, name="apiOverview"),
+    # APi for user's
+    path('api/users/', views.userList, name="userList"),
+
     # API for Todo items
     path('api/todo-list/', views.todoList, name='todoListAPI'),
+    path('api/todo-list-incomplete/', views.todoListIncomplete,
+         name='todoListIncompletedAPI'),
+    path('api/todo-list-completed/', views.todoListCompleted,
+         name='todoListCompletedAPI'),
     path('api/todo-list/<int:todo_id>/',
          views.todoListView, name="todoListViewAPI"),
     path('api/create-todo/', views.createTodo, name="createTodoAPI"),

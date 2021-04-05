@@ -3,6 +3,10 @@
     margin: 0;
 }
 
+button {
+    display: flex;
+}
+
 #id_title {
     width: 300%;
     padding: 6px 20px;
@@ -55,7 +59,7 @@
 }
 
 hr {
-    border-top: .5px solid black;
+    border-top: 2px solid black;
 }
 
 h3,
@@ -81,4 +85,15 @@ h5 {
     font-size: large;
     height: 30px;
     width: 100%;
+}
+
+section {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.completed-list {
+    background: #efb5ff !important;
+    color: #263ad1 !important;
+    border: none;
 }

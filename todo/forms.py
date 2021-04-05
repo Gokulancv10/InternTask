@@ -21,7 +21,6 @@ class TaskForm(forms.ModelForm):
 
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField()
 
     class Meta:
         model = User

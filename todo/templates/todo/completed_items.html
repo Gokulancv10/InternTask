@@ -1,3 +1,154 @@
+{% for i in page_obj %}
+    <li class="list-group-item list-group-item-info mb-1">
+        {{ i.title }}
+        <div class="float-right">
+            <h5>
+                <a class="badge badge-light"
+                    href="{% url 'completed_todo' i.id %}">
+                    &#10004;
+                </a>
+                <a class="badge badge-warning ml-1" href="{% url 'delete_todo' i.id %}">
+                    ❌
+                </a>
+            </h5>
+        </div>
+        <div class="float-right">
+            <!-- Button trigger modal for update todo-->
+            <a class="fa fa-edit mt-1 ml-1 mr-1" href="{% url 'update_todo' i.id %}"
+                data-toggle="modal" data-target="#updateTodoModal_{{ i.id }}" id="update_modal">
+            </a>
+
+            <!-- Update Todo Modal for updating Todo Items -->
+            <div class="modal fade" id="updateTodoModal_{{ i.id }}" tabindex="-1" role="dialog"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 class="modal-title mb-1">Update To-Do</h5>
+                            <form action="{% url 'update_todo' i.id %}" method="POST">
+                                {% csrf_token %}
+                                <li class="list-group-item list-group-item-warning mb-1" id="update_todo_list">
+                                    <input type="text" value="{{ i.title }}" name="title" id="update_todoinp" />
+                                </li>
+                                
+                                {% if i.tasks.all %}
+                                    <hr>
+                                    <h5 class="modal-title mb-1" id="task-title">
+                                        Update Task Item{{ i.tasks.count|pluralize }}
+                                    </h5>
+                                {% endif %}
+
+                                {% for j in i.tasks.all %}
+                                    <li class="list-group-item list-group-item-dark mb-1" id="update_task_list">
+                                        <input class="mb-1" type="text" value="{{ j.heading }}" name="heading_{{ j.id }}"
+                                        id="update_taskinp" />
+                                    </li>
+                                {% endfor %}
+                                <div class="modal-footer">
+                                    <button class="btn btn-success ml-2" type="submit">Submit</button>
+                                </div>                                                
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="float-right">
+            <!-- Button trigger modal for adding tasks-->
+            <h5>
+                <a class="badge badge-primary mr-1" href="{% url 'addTask' i.id %}"
+                    data-toggle="modal" data-target="#addnewTaskModal_{{ i.id }}" name="addTask">
+                    &#x271A;
+                </a>
+            </h5>
+
+            <!-- Task Modal for adding tasks under todo items -->
+            <div class="modal fade" id="addnewTaskModal_{{ i.id }}" data-backdrop="static" tabindex="-1"
+                role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">
+                                Add New Task for {{ i.title }}
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'addTask' i.id %}" method="POST" id="addTask">
+                                {% csrf_token %}
+
+                                <input type="text" class="form-group mb-2" id="addTaskinput"
+                                    placeholder="Enter the task name.." name="heading"> 
+                                                                            
+                                <div class="modal-footer">
+                                    <button class="btn btn-success" type="submit">
+                                        Submit
+                                    </button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">
+                                        Close
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for j in i.tasks.all %}
+        {% if j.completed == False %}
+            <div class="card mt-3">
+                <ul class="list-group" id="taskList">
+                    <li class="list-group-item list-group-item-danger">
+                        <div class="float-left">
+                            {{ j.heading }}
+                        </div>
+                        <div class="float-right">
+                            <h5>
+                                <a class="badge badge-light mr-1"
+                                    href="{% url 'completed_task' j.id %}">
+                                    &#10004;
+                                </a>
+
+                                <!-- Delete Task -->
+                                <a class="badge badge-warning mt-1 mr-1"
+                                    href="{% url 'delete_task' j.id %}">
+                                    ❌
+                                </a>
+                            </h5>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        {% else %}
+            <div class="card mt-3">
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-warning" id="upcomingItem">
+                        <div class="float-left">
+                            {{ j.heading }}
+                        </div>
+                        <div class="float-right">
+                            <h5>
+                                <a class="badge badge-warning ml-1 mr-1"
+                                    href="{% url 'delete_task' j.id %}">❌</a>
+                            </h5>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+        {% endfor %}
+    </li>
+    {% endfor %}
+
 
 <div class="col-sm-5">
     <div class="card">
@@ -6,9 +157,9 @@
                 Completed Item{{ todo_items_completed|pluralize }}
             </h5>
             <hr>
-            {% for i in page_obj2 %}
-            <ul class="list-group" id="upcomingItems">
-                <li class="list-group-item list-group-item-warning mb-1" id="upcomingItem">
+            <ul class="list-group" id="CompletedTodo">
+                {% for i in page_obj2 %}
+                <li class="list-group-item list-group-item-warning mb-1">
                     {{ i.title }}
                     <div class="float-right">
                         <h5>
@@ -19,7 +170,7 @@
                     {% for j in i.tasks.all %}
                         {% if j.completed == True %}
                             <div class="card mt-3">
-                                <ul class="list-group">
+                                <ul class="list-group" id="completedTask">
                                     <li class="list-group-item list-group-item-dark" id="completedItem">
                                         {{ j.heading }}
                                         <div class="float-right">
@@ -36,8 +187,8 @@
                         {% endif %}
                     {% endfor %}
                 </li>
+                {% endfor %}
             </ul>
-            {% endfor %}
 
             {% if todo_items_completed > 4 %}
             <hr>

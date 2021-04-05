@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'MyToDoProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':str( BASE_DIR / 'db.sqlite3'),
+        'NAME': str( BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -102,6 +102,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}
 
 
 # Internationalization

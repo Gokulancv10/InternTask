@@ -5,12 +5,14 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Todo, Task
 from .forms import TodoForm, TaskForm, UserRegisterForm
-from .serializers import TodoSerializer, TaskSerializer
+from .serializers import TodoSerializer, TaskSerializer, UserSerializer
 
 
 def register(request):
@@ -33,9 +35,59 @@ def logout_user(request):
     return redirect('login')
 
 
+@login_required
+def list(request):
+    return render(request, 'todo/main.html')
+
+
+@api_view(['GET'])
+def apiOverview(request):
+    api_urls = {
+        'All Todo Items': 'http://127.0.0.1:8000/api/todo-list/',
+        'Todo Items Incomplete': 'http://127.0.0.1:8000/api/todo-list-incomplete/',
+        'Todo Items Completed': 'http://127.0.0.1:8000/api/todo-list-completed/',
+        'Specific Todo Item': 'http://127.0.0.1:8000/api/todo-list/<int:todo_id>/',
+        'Create new Todo Item': 'http://127.0.0.1:8000/api/create-todo/',
+        'Update already exists Todo item': 'http://127.0.0.1:8000/api/update-todo/<int:todo_id>/',
+        'Delete Specific Todo Item': 'http://127.0.0.1:8000/api/delete-todo/<int:todo_id>/',
+        'All Task Items': 'http://127.0.0.1:8000/api/task-list/',
+        'Specific Task Item': 'http://127.0.0.1:8000/api/task-list/<int:taskid>/',
+        'Create new Task Item': 'http://127.0.0.1:8000/api/create-task/',
+        'Update already exists Task item': 'http://127.0.0.1:8000/api/update-task/<int:task_id>/',
+        'Delete Specific Task Item': 'http://127.0.0.1:8000/api/delete-task/<int:task_id>/',
+    }
+    return Response(api_urls)
+
+
+@api_view(['GET'])
+def userList(request):
+    try:
+        user = User.objects.all()
+    except Exception as e:
+        Http404(e)
+    serializer = UserSerializer(user, many=True)
+    return Response(serializer.data)
+
+
 @api_view(['GET'])
 def todoList(request):
-    todo = Todo.objects.filter(user_id=request.user)
+    todo = Todo.objects.filter(user_id=request.user).order_by('-date_created')
+    serializer = TodoSerializer(todo, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def todoListIncomplete(request):
+    todo = Todo.objects.filter(
+        user_id=request.user, completed=False).order_by('-date_created')
+    serializer = TodoSerializer(todo, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def todoListCompleted(request):
+    todo = Todo.objects.filter(
+        user_id=request.user, completed=True).order_by('-date_created')
     serializer = TodoSerializer(todo, many=True)
     return Response(serializer.data)
 
@@ -73,16 +125,17 @@ def createTodo(request):
 
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 @api_view(['POST'])
 def createTask(request):
     serializer = TaskSerializer(data=request.data)
-
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 @api_view(['POST'])
@@ -95,7 +148,8 @@ def updateTodo(request, todo_id):
     serializer = TodoSerializer(instance=todo, data=request.data)
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 @api_view(['POST'])
@@ -108,7 +162,8 @@ def updateTask(request, task_id):
     serializer = TaskSerializer(instance=task, data=request.data)
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 @api_view(['DELETE'])
@@ -117,6 +172,7 @@ def deleteTodo(request, todo_id):
         todo = Todo.objects.get(id=todo_id, user_id=request.user)
     except Exception as e:
         return HttpResponse(e)
+    todo.tasks.all().delete()
     todo.delete()
     return Response('Todo Deleted Successfully!!')
 
@@ -124,7 +180,7 @@ def deleteTodo(request, todo_id):
 @api_view(['DELETE'])
 def deleteTask(request, task_id):
     try:
-        task = Todo.objects.get(id=task_id, user_id=request.user)
+        task = Task.objects.get(id=task_id, user_id=request.user)
     except Exception as e:
         return HttpResponse(e)
     task.delete()
