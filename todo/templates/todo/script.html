@@ -1,5 +1,5 @@
 <script type="text/javascript">
-
+        
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -35,28 +35,30 @@
                             data-id="${todoItems[todo].id}" name="todo_${todoItems[todo].id}">
                             <span class='title'>${todoItems[todo].title}</span>
                             <div class="float-right">
-                                <button type="button" class="btn btn-sm btn-primary add-task">
-                                    &#x271A;
-                                </button>
-                            </div>
-                            <div class="float-right">
-                                <button class="btn btn-sm btn-dark mr-2 edit">
-                                    e
-                                </button>
-                            </div>
-                            <div class="float-right">
-                                <button class="btn btn-sm btn-light mr-2 completed-todo">
-                                    &#10004;
-                                </button>
-                            </div>
-                            <div class="float-right">
-                                <button class="btn btn-sm btn-warning mr-2 delete-todo">
+                                <badge type="submit" class="badge badge-warning delete-todo">
                                     ❌
-                                </button>
+                                </badge>
                             </div>
-
-                            ${todoItems[todo].tasks ? taskIncomplete(todoItems[todo].tasks) : ''}     
+                            <div class="float-right">
+                                <badge type="submit" class="badge badge-light mr-1 completed-todo">
+                                    &#10004;
+                                </badge>
+                            </div>          
+                            <div class="float-right">
+                                <badge type="submit" class="badge badge-dark mr-1 edit">
+                                    edit
+                                </badge>
+                            </div>
+                            <div class="float-right mr-1">
+                                <badge type="submit" class="badge badge-primary add-task" data-open='add-task'>
+                                    &#x271A;
+                                </badge>
+                            </div>                        
+                            <div class="card mt-3 flex-wrap incompleteTodo-task">
+                                ${todoItems[todo].tasks ? taskStatus(todoItems[todo].tasks) : ''}  
+                            </div>   
                         </div>`
+
                     incomplete.innerHTML += info;
 
                 };
@@ -73,12 +75,13 @@
                         
                     })(todoItems[todo]))
 
-                    addTaskBtn.addEventListener('click', (function(element){
-                        return function(){
-                            addNewTask(element)
-                        }
-                        
-                    })(todoItems[todo]))
+                    $('.add-task').click(function(){
+                        $('#add-task').modal() 
+                    })
+                    // addTaskBtn.addEventListener('click', (function(element){
+                    
+                                     
+                    // })(todoItems[todo]))
 
                     completedTodoBtn.addEventListener('click', (function(element){
                         return function(){
@@ -95,32 +98,61 @@
                     var a = todoItems[todo].tasks
                     for (var t in a){
                         var deleteTaskBtn = document.getElementsByClassName('delete-task')[t]
+                        var completeTaskBtn = document.getElementsByClassName('complete-task')[t]
+                        var editTaskBtn = document.getElementsByClassName('edit-task')[t]
 
                         deleteTaskBtn.addEventListener('click', (function(element){
                             return function(){
                                 deleteTask(element)
                             }
                         })(a[t]))
-                    }               
+
+                        
+                        completeTaskBtn.addEventListener('click', (function(element){
+                            return function(){
+                                completedTask(element)
+                            }
+                        })(a[t]))
+
+                        editTaskBtn.addEventListener('click', (function(element){
+                            return function(){
+                                editTaskItem(element)
+                            }
+                        })(a[t]))
+                    }             
                 };
             });
 
-        function taskIncomplete(item) {
+        function taskStatus(item) {
             return `
-                ${item.map(task => 
-                    `<div class="card mt-3" data-id=${task.id}>
-                        <div class="list-group-item list-group-item-danger flex-wrap" >
+                ${item.map(task =>
+                    `${task.completed==false ? 
+                        `
+                        <div class="list-group-item list-group-item-danger mb-1 flex-wrap" >
                             <span class='heading'>${task.heading} ${task.completed}</span>
                             <section class='float-right'>
-                                <button class="btn btn-sm btn-light" id="completedTask">
+                                <badge type="submit" class="badge badge-dark mr-1 edit-task">
+                                    edit
+                                </badge>
+                                <badge type="submit" class="badge badge-light complete-task">
                                     &#10004;
-                                </button>
-                                <button class="btn btn-sm btn-warning ml-1 delete-task" id="deleteTask">
+                                </badge>
+                                <badge type="submit" class="badge badge-warning ml-1 delete-task">
                                     ❌
-                                </button>
+                                </badge>
                             </section>
-                        </div>
-                    </div>` 
+                        </div>`
+                        :
+                        `
+                        <div class="list-group-item list-group-item-dark flex-wrap" >
+                            <span class='heading'>${task.heading} ${task.completed}</span>
+                            <section class='float-right'>
+                                <badge type="submit" class="badge badge-warning delete-task">
+                                    ❌
+                                </badge>
+                            </section>
+                        </div>`
+                    }` 
                 ).join('')}
             `
         };
@@ -132,9 +164,9 @@
                         <div class="list-group-item list-group-item-dark">
                             <span class='heading'>${task.heading}</span>
                             <section class='float-right'>
-                                <button class="btn btn-sm btn-warning ml-1" id="deleteTask">
+                                <badge type="submit" class="badge badge-warning ml-1" id="deleteTask">
                                     ❌
-                                </button>
+                                </badge>
                             </section>
                         </div>
                     </div>` 
@@ -161,9 +193,9 @@
                             data-id="${todoItems[todo].id}" name="todo_${todoItems[todo].id}">
                             <span class='title'>${todoItems[todo].title}</span>
                             <div class="float-right">
-                                <button class="btn btn-sm btn-warning mr-2 delete-todo">
+                                <badge type="submit" class="badge badge-warning mr-2 delete-todo">
                                     ❌
-                                </button>
+                                </badge>
                             </div>
 
                             ${todoItems[todo].tasks ? taskCompleted(todoItems[todo].tasks) : ''}     
@@ -200,9 +232,9 @@
                         <div class="list-group-item list-group-item-dark">
                             <span class='heading'>${task.heading}</span>
                             <section class='float-right'>
-                                <button class="btn btn-sm btn-warning ml-1 delete-task">
+                                <badge type="submit" class="badge badge-warning ml-1 delete-task">
                                     ❌
-                                </button>
+                                </badge>
                             </section>
                         </div>
                     </div>` 
@@ -232,14 +264,17 @@
         }).then(function(response){
             $('#id_title').val('');
             TodolistIncomplete();
-            // TodolistCompleted()
-
         });
     });
 
     function editItem(item){
         activeItem = item
         document.getElementById('id_title').value = activeItem.title;
+    }
+
+    function editTaskItem(item){
+        console.log(item.heading)
+        document.getElementById('id_title').value = item.heading;
     }
 
     function deleteTodo(item){
@@ -260,7 +295,7 @@
         console.log('Completed Todo Clicked', item.title)
         var user_id = $('#welcome').data('id')
         item.completed =!item.completed
-        fetch(`http://127.0.0.1:8000/api/update-todo/${item.id}/`, {
+        fetch(`http://127.0.0.1:8000/api/complete-todo-task/${item.id}/`, {
             method:'POST',
             headers:{
                 'Content-type':'application/json',
@@ -268,6 +303,25 @@
             },
             body:JSON.stringify({'title':item.title, 'user_id':user_id, 'completed':item.completed})
         }).then((response) => {
+            TodolistIncomplete();
+            TodolistCompleted();
+        })
+    }
+
+    function completedTask(item){
+        console.log('Completed Task Clicked', item.heading)
+        var user_id = $('#welcome').data('id')
+        item.completed =!item.completed
+        fetch(`http://127.0.0.1:8000/api/complete-task/${item.id}/`, {
+            method:'POST',
+            headers:{
+                'Content-type':'application/json',
+                'X-CSRFToken':csrftoken,
+            },
+            body:JSON.stringify({'heading':item.heading, 'user':user_id, 
+                'completed':item.completed, 'todo':item.todo, 'user_id':user_id, 'title':'title'})
+        }).then((response) => {
+            TodolistIncomplete();
             TodolistCompleted();
         })
     }

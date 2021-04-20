@@ -12,6 +12,13 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
+
 class TodoSerializer(WritableNestedModelSerializer,
                      serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, allow_null=True, required=False)
@@ -20,11 +27,3 @@ class TodoSerializer(WritableNestedModelSerializer,
         model = Todo
         fields = ['id', 'title', 'date_created',
                   'completed', 'user_id', 'tasks']
-
-
-class UserSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
-    todo = TodoSerializer(many=True)
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'todo']

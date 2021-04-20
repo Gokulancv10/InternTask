@@ -4,16 +4,6 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    # path('', views.home, name='home'),
-    # path('update_todo/<int:todo_id>/', views.update_todo, name='update_todo'),
-    # path('completed_todo/<int:todo_id>/',
-    #      views.completed_todo, name="completed_todo"),
-    # path('completed_task/<int:task_id>/',
-    #      views.completed_task, name="completed_task"),
-    # path('delete_todo/<int:todo_id>/', views.delete_todo, name='delete_todo'),
-    # path('delete_task/<int:task_id>/', views.delete_task, name='delete_task'),
-    # path('add_task/<int:task_id>/', views.add_task, name='addTask'),
-
     path('', views.list, name='home'),
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(
@@ -23,8 +13,6 @@ urlpatterns = [
 
     # All API urls
     path('api/', views.apiOverview, name="apiOverview"),
-    # APi for user's
-    path('api/users/', views.userList, name="userList"),
 
     # API for Todo items
     path('api/todo-list/', views.todoList, name='todoListAPI'),
@@ -39,6 +27,8 @@ urlpatterns = [
          views.updateTodo, name="todoUpdateAPI"),
     path('api/delete-todo/<int:todo_id>/',
          views.deleteTodo, name="todoDeleteAPI"),
+    path('api/completeTodoTask/<int:todo_id>/', views.completeTodoTask),
+    path('api/complete-task/<int:task_id>/', views.completeTask),
 
     # API for Task items
     path('api/task-list/', views.taskList, name='taskListAPI'),
@@ -49,4 +39,9 @@ urlpatterns = [
          views.updateTask, name="taskUpdateAPI"),
     path('api/delete-task/<int:task_id>/',
          views.deleteTask, name="taskDeleteAPI"),
+
+    # API - Incomplete Todo Items for Pagination
+    path('api/todo-incomplete/', views.todoIncomplete, name='todoIncomplete'),
+    # API - Completed Todo Items for Pagination 
+    path('api/todo-completed/', views.todoCompleted, name='todoIncomplete')
 ]

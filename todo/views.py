@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import Http404, JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.utils import timezone
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
 
 from .models import Todo, Task
 from .forms import TodoForm, TaskForm, UserRegisterForm
@@ -43,30 +45,20 @@ def list(request):
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'All Todo Items': 'http://127.0.0.1:8000/api/todo-list/',
-        'Todo Items Incomplete': 'http://127.0.0.1:8000/api/todo-list-incomplete/',
-        'Todo Items Completed': 'http://127.0.0.1:8000/api/todo-list-completed/',
-        'Specific Todo Item': 'http://127.0.0.1:8000/api/todo-list/<int:todo_id>/',
-        'Create new Todo Item': 'http://127.0.0.1:8000/api/create-todo/',
-        'Update already exists Todo item': 'http://127.0.0.1:8000/api/update-todo/<int:todo_id>/',
-        'Delete Specific Todo Item': 'http://127.0.0.1:8000/api/delete-todo/<int:todo_id>/',
-        'All Task Items': 'http://127.0.0.1:8000/api/task-list/',
-        'Specific Task Item': 'http://127.0.0.1:8000/api/task-list/<int:taskid>/',
-        'Create new Task Item': 'http://127.0.0.1:8000/api/create-task/',
-        'Update already exists Task item': 'http://127.0.0.1:8000/api/update-task/<int:task_id>/',
-        'Delete Specific Task Item': 'http://127.0.0.1:8000/api/delete-task/<int:task_id>/',
+        'All Todo Items': '/api/todo-list/',
+        'Todo Items Incomplete': '/api/todo-list-incomplete/',
+        'Todo Items Completed': '/api/todo-list-completed/',
+        'Specific Todo Item': '/api/todo-list/<int:todo_id>/',
+        'Create new Todo Item': '/api/create-todo/',
+        'Update already exists Todo item': '/api/update-todo/<int:todo_id>/',
+        'Delete Specific Todo Item': '/api/delete-todo/<int:todo_id>/',
+        'All Task Items': '/api/task-list/',
+        'Specific Task Item': '/api/task-list/<int:taskid>/',
+        'Create new Task Item': '/api/create-task/',
+        'Update already exists Task item': '/api/update-task/<int:task_id>/',
+        'Delete Specific Task Item': '/api/delete-task/<int:task_id>/',
     }
     return Response(api_urls)
-
-
-@api_view(['GET'])
-def userList(request):
-    try:
-        user = User.objects.all()
-    except Exception as e:
-        Http404(e)
-    serializer = UserSerializer(user, many=True)
-    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -79,7 +71,7 @@ def todoList(request):
 @api_view(['GET'])
 def todoListIncomplete(request):
     todo = Todo.objects.filter(
-        user_id=request.user, completed=False).order_by('-date_created')
+        user_id=request.user, completed=False).order_by('completed')
     serializer = TodoSerializer(todo, many=True)
     return Response(serializer.data)
 
@@ -153,6 +145,41 @@ def updateTodo(request, todo_id):
 
 
 @api_view(['POST'])
+def completeTodoTask(request, todo_id):
+    try:
+        todo = Todo.objects.get(id=todo_id, user_id=request.user)
+    except Exception as e:
+        return HttpResponse(e)
+    todo.tasks.filter(completed=False).update(completed=True)
+    todo.completed = True
+    todo.save()
+
+    serializer = TodoSerializer(instance=todo, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors)
+
+
+@api_view(['POST'])
+def completeTask(request, task_id):
+    try:
+        task = Task.objects.get(id=task_id, user_id=request.user)
+    except Exception as e:
+        return HttpResponse(e)
+    task.completed = True
+    task.save()
+    if task.todo.tasks.filter(completed=False).count() == 0:
+        task.todo.completed = True
+        task.todo.save()
+    serializer = TodoSerializer(instance=task, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors)
+
+
+@api_view(['POST'])
 def updateTask(request, task_id):
     try:
         task = Task.objects.get(id=task_id, user_id=request.user)
@@ -187,116 +214,59 @@ def deleteTask(request, task_id):
     return Response('Task Deleted Successfully!!')
 
 
-@login_required(login_url='login')
-def home(request):
+class IncompleteTodoPagination(PageNumberPagination):
+    page_size = 3
+    page_query_param = 'incomplete'
+    page_size_query_param = 'i'
+    max_page_size = 10
 
-    task_form = TaskForm()
-    todo_items_incomplete = Todo.objects.filter(
+    def get_paginated_response(self, data):
+
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'current_page_no': self.page.number,
+            'per_page': self.page.paginator.per_page,
+            'results': data
+        })
+
+
+class CompletedTodoPagination(PageNumberPagination):
+    page_size = 3
+    page_query_param = 'completed'
+    page_size_query_param = 'c'
+    max_page_size = 10
+
+    def get_paginated_response(self, data):
+
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'current_page_no': self.page.number,
+            'per_page': self.page.paginator.per_page,
+            'results': data
+        })
+
+
+@api_view(['GET'])
+def todoIncomplete(request):
+    todo = Todo.objects.filter(
         user_id=request.user, completed=False).order_by('-date_created')
-    todo_items_completed = Todo.objects.filter(
+    paginator = IncompleteTodoPagination()
+    result_page = paginator.paginate_queryset(todo, request)
+    serializer = TodoSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
+def todoCompleted(request):
+    todo = Todo.objects.filter(
         user_id=request.user, completed=True).order_by('-date_created')
-    pagination_upcoming = Paginator(todo_items_incomplete, 4)
-    pagination_completed = Paginator(todo_items_completed, 4)
-    page_upcoming = request.GET.get('upcoming', 1)
-    page_completed = request.GET.get('completed', 1)
-    page_data_upcoming = pagination_upcoming.get_page(page_upcoming)
-    page_data_completed = pagination_completed.get_page(page_completed)
-
-    todo_form = TodoForm()
-    if request.method == "POST":
-        print(request)
-        todo_form1 = TodoForm(request.POST)
-        if todo_form1.is_valid():
-            data = todo_form1.cleaned_data.get('title')
-            Todo.objects.create(
-                date_created=timezone.now(), title=data, user_id=request.user)
-        return redirect('/')
-    context = {
-        'todo_form': todo_form,
-        'page_obj': page_data_upcoming,
-        'page_obj2': page_data_completed,
-        'pagi1': pagination_upcoming,
-        'pagi2': pagination_completed,
-        'page_num2': int(page_completed),
-        'page_num': int(page_upcoming),
-        'task_form': task_form,
-        'todo_items_incomplete': len(todo_items_incomplete),
-        'todo_items_completed': len(todo_items_completed)
-    }
-    return render(request, 'todo/main.html', context)
-
-
-@login_required(login_url='login')
-@require_POST
-def update_todo(request, todo_id):
-
-    try:
-        obj = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as err:
-        raise Http404(err)
-    obj.title = request.POST.get('title')
-    for task in obj.tasks.all():
-        result = Task.objects.get(id=task.id)
-        result.heading = request.POST.get('heading_'+str(task.id))
-        result.save()
-    obj.save()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@login_required(login_url='login')
-@require_POST
-def add_task(request, task_id):
-    try:
-        obj = Todo.objects.get(id=task_id, user_id=request.user)
-    except Exception as err:
-        raise Http404(err)
-    obj = Task.objects.create(heading=request.POST.get(
-        'heading'), date_created=timezone.now(), todo=obj, user=request.user)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@login_required(login_url='login')
-def delete_todo(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as err:
-        raise Http404(err)
-    todo.tasks.all().delete()
-    todo.delete()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@login_required(login_url='login')
-def delete_task(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user=request.user)
-    except Exception as err:
-        raise Http404(err)
-    task.delete()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@login_required(login_url='login')
-def completed_todo(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as err:
-        raise Http404(err)
-    todo.tasks.filter(completed=False).update(completed=True)
-    todo.completed = True
-    todo.save()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@login_required(login_url='login')
-def completed_task(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user=request.user)
-    except Exception as err:
-        raise Http404(err)
-    task.completed = True
-    task.save()
-    if task.todo.tasks.filter(completed=False).count() == 0:
-        task.todo.completed = True
-        task.todo.save()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    paginator = CompletedTodoPagination()
+    result_page = paginator.paginate_queryset(todo, request)
+    serializer = TodoSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)

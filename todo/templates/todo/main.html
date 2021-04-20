@@ -1,7 +1,9 @@
 {% extends 'todo/index.html' %}
 {% block content %}
 <div class="center-column" id="center-column">
-    <h5 class="card-title" id="welcome" data-id={{ request.user.id }}>Hello {{ request.user.username|capfirst }}, Create your todo list's</h5>
+    <h5 class="card-title" id="welcome" data-id={{ request.user.id }}>
+        Hello {{ request.user.username }}, Create your todo list's
+    </h5>
     <div id="addTodoForm">
         <form action="" method="">
             <div class="input-group-append">
@@ -23,6 +25,16 @@
                 <hr />
                 <div class="list-group flex-wrap" id="incompleteTodo">
                 </div>
+                <hr>
+                <nav aria-label="..." id="incompletePagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                            <button class="page-link" tabindex="-1" id="prevPageI">&laquo</button>
+                        </li>
+                        <li class="page-item"><button class="page-link" id="currPageI">1</button></li>
+                        <li class="page-item"><button class="page-link" id="nextPageI" >&raquo</button></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -35,9 +47,19 @@
                 <hr>
                 <div class="list-group" id="completedTodo">
                 </div>
+                <hr>
+                <nav aria-label="..." id="completedPagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                            <button class="page-link" tabindex="-1" id="prevPageC">&laquo</button>
+                        </li>
+                        <li class="page-item"><button class="page-link" id="currPageC">1</button></li>
+                        <li class="page-item"><button class="page-link" id="nextPageC">&raquo</button></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
-    {% include 'todo/script.html' %}
 </div>
+
 {% endblock %}

@@ -55,8 +55,7 @@ button {
 .card-body {
     border-radius: 3px;
     box-shadow: 3px 3px 20px 0px rgba(0, 0, 0, 0.75);
-    justify-self: center;
-}
+    justify-self: center;}
 
 hr {
     border-top: 2px solid black;
@@ -92,8 +91,15 @@ section {
     flex-wrap: wrap;
 }
 
-.completed-list {
-    background: #efb5ff !important;
-    color: #263ad1 !important;
-    border: none;
+.incompleteTodo-task{
+    background-color: #b8daff !important;
+}
+
+.completedTodoTask {
+    background-color: #efb5ff !important;
+}
+
+#title {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
 }
