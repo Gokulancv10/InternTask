@@ -17,63 +17,52 @@ var csrftoken = getCookie('csrftoken');
 function taskStatus(item) {
     return `
         ${item.map(task =>
-            `${task.completed==false ? 
-                `
-                <div class="card list-group-item list-group-item-danger mt-1 flex-wrap" >
-                    <span class='heading'>${task.heading}</span>
-                    <div class="float-right">
-                        <badge type="submit" class="badge badge-light" id="complete-task_${task.id}">
-                            &#10004;
-                        </badge>
-                        <badge type="submit" class="badge badge-warning ml-1" id="delete-task_${task.id}">
-                            ❌
-                        </badge>
-                    </div>
-                    <div class='float-right'>
-                        <badge type="submit" class="badge badge-dark mr-1 edit-task"
-                        data-target="#updateTaskModal_${task.id}" data-toggle="modal">
-                            edit
-                        </badge>
+            `
+            <div class="card list-group-item list-group-item-danger mt-1" id="task_${task.id}">
+                <span class='font-italic'>${task.heading}</span>
+                <div class="float-right">
+                    <badge type="submit" class="badge badge-light" id="complete-task_${task.id}">
+                        &#10004;
+                    </badge>
+                    <badge type="submit" class="badge badge-warning ml-1" id="delete-task_${task.id}">
+                        ❌
+                    </badge>
+                </div>
+                <div class='float-right'>
+                    <badge type="submit" class="badge badge-dark mr-1 edit-task" id="edit-task_${task.id}"
+                    data-target="#updateTaskModal_${task.id}" data-toggle="modal">
+                        edit
+                    </badge>
 
-                        <div class="modal fade" id="updateTaskModal_${task.id}" tabindex="-1" role="dialog"
-                                aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Update Todo</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                    <div class="modal fade" id="updateTaskModal_${task.id}" tabindex="-1" role="dialog"
+                            aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Update Todo</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="list-group-item list-group-item-warning">
+                                        <input type="text" required id='updateTaskInp_${task.id}' size='50'
+                                            name="heading_${task.id}" value="${task.heading}">
                                     </div>
-                                    <div class="modal-body">
-                                        <div class="list-group-item list-group-item-warning">
-                                            <input type="text" required id='updateTaskInp_${task.id}' size='45' name="heading_${task.id}"
-                                            value="${task.heading}">
-                                        </div>
-                                    </div>
-                                        <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" id="updateTaskModalSubmit_${task.id}"
-                                            data-dismiss="modal">
-                                            Submit
-                                        </button>
-                                    </div>
+                                </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="updateTaskModalSubmit_${task.id}"
+                                        data-dismiss="modal">
+                                        Submit
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>`
-                :
-                `
-                <div class="list-group-item list-group-item-dark flex-wrap mt-1">
-                    <span class='heading'>${task.heading}</span>
-                    <div class='float-right'>
-                        <badge type="submit" class="badge badge-warning" id="delete-task_${task.id}">
-                            ❌
-                        </badge>
-                    </div>
-                </div>`
-            }` 
+                </div>
+            </div>`
+                
         ).join('')}
     `
 };
@@ -82,8 +71,8 @@ function taskCompleted(item) {
     return `
         ${item.map(task => 
             `
-            <div class="list-group-item list-group-item-warning mb-1">
-                <span class='heading'>${task.heading}</span>
+            <div class="list-group-item bg-danger mb-1">
+                <span class='text-light font-italic'>${task.heading}</span>
                 <div class='float-right'>
                     <badge type="submit" class="badge badge-warning ml-1" id="delete-task_${task.id}">
                         ❌
@@ -155,6 +144,7 @@ $(document).ready(function() {
                 nextUrlI = data.next;
                 if (data.next != null) {
                     $('#nextPageI').css("visibility", "visible")
+                    $('#currPageI').css("visibility", "visible")
 
                 } else {
                     $('#nextPageI').css("visibility", "hidden")
@@ -163,14 +153,15 @@ $(document).ready(function() {
                 prevUrlI = data.previous;
                 if (data.previous != null) {
                     $('#prevPageI').css("visibility", "visible")
+                    $('#currPageI').css("visibility", "visible")
                 } else {
                     $('#prevPageI').css("visibility", "hidden")
                 }
 
                 if (data.next === null && data.previous === null) {
-                    $('#currentPageIncomplete').css("visibility", "hidden")
+                    $('#currPageI').css("visibility", "hidden")
                 } else {
-                    $('#currentPageIncomplete').css("visibility", "vsible")
+                    $('#currPageI').css("visibility", "vidible")
                 }
 
                 var todoItems = data.results
@@ -178,7 +169,7 @@ $(document).ready(function() {
                     $('#incompleteTodo').append(
                         `<div class="list-group-item list-group-item-primary mb-1" id="todo-${todo}"
                             data-id="${todoItems[todo].id}">
-                            <span class='title'>${todoItems[todo].title}</span>
+                            <span class="font-weight-bold">${todoItems[todo].title}</span>
                             <div class="float-right">
                                 <badge type="submit" class="badge badge-warning" id="deleteTodo_${todoItems[todo].id}">
                                     ❌
@@ -209,7 +200,7 @@ $(document).ready(function() {
                                             <div class="modal-body">
                                                 <div class="list-group-item list-group-item-warning">
                                                     <input type="text" id='updateTodoInp_${todoItems[todo].id}'
-                                                        size='45' value="${todoItems[todo].title}">
+                                                        size="50" value="${todoItems[todo].title}">
                                                 </div>
                                             </div>
                                                 <div class="modal-footer">
@@ -244,8 +235,10 @@ $(document).ready(function() {
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                            <input type="text" required id='addTaskInp_${todoItems[todo].id}' size='45'
-                                                name="heading" placeholder="Enter the task name here...">
+                                                <div class="list-group-item list-group-item-dark">
+                                                    <input type="text" required id='addTaskInp_${todoItems[todo].id}' size="50"
+                                                        name="heading" placeholder="Enter the task name here...">
+                                                </div>  
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary closeModal"
@@ -288,7 +281,6 @@ $(document).ready(function() {
 
                     editTodoBtn.addEventListener('click', (function(element) {
                         return function() {
-                            stateSave: true
                             editTodoItem(element)
                         }
                     })(todoItems[todo]))
@@ -322,7 +314,14 @@ $(document).ready(function() {
                                 editTaskItem(element)
                             }
                         })(taskItems[task]))
-                    }
+
+                        if(taskItems[task].completed===true){
+                            $(`#task_${taskItems[task].id}`).removeClass("list-group-item-danger")
+                            $(`#task_${taskItems[task].id}`).addClass("list-group-item-dark")
+                            $(`#edit-task_${taskItems[task].id}`).remove()
+                            $(`#complete-task_${taskItems[task].id}`).remove()
+                        }
+                    }    
                 }
             },
             error: function(err) {
@@ -383,9 +382,9 @@ $(document).ready(function() {
                 for (var todo in todoItems) {
                     $('#completedTodo').append(
                         `
-                        <div class="list-group-item list-group-item-info completed-list mb-1"
+                        <div class="list-group-item bg-success mb-1"
                             id="todo_${todoItems[todo].id}" data-id="${todoItems[todo].id}">
-                            <span class="title">${todoItems[todo].title}</span>
+                            <span class="text-light font-weight-bold">${todoItems[todo].title}</span>
                             <div class="float-right">
                                 <badge type="submit" class="badge badge-warning mr-2"
                                     id="deleteTodo_${todoItems[todo].id}">
@@ -393,7 +392,7 @@ $(document).ready(function() {
                                 </badge>
                             </div>
                             <div class="completedTodoTask mt-3">                  
-                                ${todoItems[todo].tasks ? taskStatus(todoItems[todo].tasks) : ''}
+                                ${todoItems[todo].tasks ? taskCompleted(todoItems[todo].tasks) : ''}
                             </div>  
                         </div>
                         `

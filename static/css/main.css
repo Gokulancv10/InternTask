@@ -95,10 +95,6 @@ section {
     background-color: #b8daff !important;
 }
 
-.completedTodoTask {
-    background-color: #efb5ff !important;
-}
-
 #title {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
