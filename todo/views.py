@@ -17,8 +17,12 @@ from .forms import TodoForm, TaskForm, UserRegisterForm
 from .serializers import TodoSerializer, TaskSerializer, UserSerializer
 
 
-def register(request):
+@login_required
+def home(request):
+    return render(request, 'todo/main.html')
 
+
+def register(request):
     form = UserRegisterForm()
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -32,20 +36,15 @@ def register(request):
 
 
 def logout_user(request):
-
     logout(request)
     return redirect('login')
 
 
 @login_required
-def list(request):
-    return render(request, 'todo/main.html')
-
-
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'Paginated Todo Items Incomplete': '/api/todo-incomplete/?incomplete=1',
+        'Paginated Todo Items Incomplete': '/api/todo-incomplete/',
         'Paginated Todo Items Completed': '/api/todo-completed/',
         'Specific Todo Item': '/api/todo-list/<int:todo_id>/',
         'Create new Todo Item': '/api/create-todo/',
@@ -59,6 +58,29 @@ def apiOverview(request):
     return Response(api_urls)
 
 
+@login_required
+@api_view(['GET'])
+def todoListView(request, todo_id):
+    try:
+        todo = Todo.objects.get(id=todo_id, user_id=request.user)
+    except Exception as e:
+        return HttpResponse(e)
+    serializer = TodoSerializer(todo, many=False)
+    return Response(serializer.data)
+
+
+@login_required
+@api_view(['GET'])
+def taskListView(request, task_id):
+    try:
+        task = Task.objects.get(id=task_id, user=request.user)
+    except Exception as e:
+        return HttpResponse(e)
+    serializer = TaskSerializer(task, many=False)
+    return Response(serializer.data)
+
+
+@login_required
 @api_view(['POST'])
 def createTodo(request):
     serializer = TodoSerializer(data=request.data)
@@ -68,6 +90,7 @@ def createTodo(request):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['POST'])
 def createTask(request):
     serializer = TaskSerializer(data=request.data)
@@ -77,6 +100,7 @@ def createTask(request):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['POST'])
 def updateTodo(request, todo_id):
     try:
@@ -90,6 +114,7 @@ def updateTodo(request, todo_id):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['POST'])
 def completeTodoTask(request, todo_id):
     try:
@@ -106,6 +131,7 @@ def completeTodoTask(request, todo_id):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['POST'])
 def completeTask(request, task_id):
     try:
@@ -124,6 +150,7 @@ def completeTask(request, task_id):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['POST'])
 def updateTask(request, task_id):
     try:
@@ -137,6 +164,7 @@ def updateTask(request, task_id):
     return Response(serializer.errors)
 
 
+@login_required
 @api_view(['DELETE'])
 def deleteTodo(request, todo_id):
     try:
@@ -148,6 +176,7 @@ def deleteTodo(request, todo_id):
     return Response('Todo Deleted Successfully!!')
 
 
+@login_required
 @api_view(['DELETE'])
 def deleteTask(request, task_id):
     try:
@@ -196,6 +225,7 @@ class CompletedTodoPagination(PageNumberPagination):
         })
 
 
+@login_required
 @api_view(['GET'])
 def todoIncomplete(request):
     todo = Todo.objects.filter(
@@ -206,6 +236,7 @@ def todoIncomplete(request):
     return paginator.get_paginated_response(serializer.data)
 
 
+@login_required
 @api_view(['GET'])
 def todoCompleted(request):
     todo = Todo.objects.filter(

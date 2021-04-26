@@ -2,9 +2,11 @@
 
 {% block content %}
 
-    <h2>You Have Been Logged Out!</h2>
-    <div class="border-top pt-3">
-        <a href="{% url 'login' %}" class="ml-1"><button class="btn-sm btn-primary">Login Again</button></a>      
+    <h2 class="text-md-center">You Have Been Logged Out!</h2>
+    <div class="border-top pt-3 text-center">
+        <a href="{% url 'login' %}" class="btn btn-sm btn-primary ml-1 px-md-3 py-md-2">
+        	Login Again
+        </a>      
     </div>
 
 

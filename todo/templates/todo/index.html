@@ -12,7 +12,7 @@
 </head>
 <body>
 	<nav class="navbar navbar-dark bg-dark">
-	    <h3 class="navbar-brand">To-Do App Using Django REST API</h3>
+	    <h3 class="navbar-brand ml-lg-4">To-Do App Using Django REST API</h3>
         {% if user.is_authenticated %}
         	<a class="nav-item nav-link" href="{% url 'logout' %}">
         		<button class="btn-sm btn-primary">
@@ -20,18 +20,14 @@
         		</button>
         	</a>
         {% else %}
-	        <section class="form-inline">
-	            <a class="nav-item nav-link" href="{% url 'login' %}">
-	            	<button class="btn-sm btn-primary">
-	            		Login
-	            	</button>
+	        <div class="form-inline">
+	            <a class="nav-item nav-link btn-sm btn-primary font-weight-bold" href="{% url 'login' %}">
+	            	Login
 	            </a>
-	            <a class="nav-item nav-link" href="{% url 'register' %}">
-	            	<button class="btn-sm btn-warning">
-	            		Register
-	            	</button>
+	            <a class="btn-sm btn-warning nav-item nav-link ml-lg-4 mr-lg-5 font-weight-bold" href="{% url 'register' %}">
+	            	Register
 	            </a>
-	        </section>        
+	        </div>        
         {% endif %}		
 	</nav>
 	<div class="container mt-3">

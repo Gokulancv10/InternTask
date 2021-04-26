@@ -2,14 +2,14 @@
 {% block content %}
 <div class="center-column" id="center-column">
     <h5 class="card-title" id="welcome" data-id={{ request.user.id }}>
-        Hello {{ request.user.username }}, Create your todo list's
+        Hello {{ request.user.username }}, Create your todo list
     </h5>
     <div id="addTodoForm">
         <form action="" method="">
             <div class="input-group-append">
                 <input type="text" class="title-input" required name="title" placeholder="e.g. Chemistry">
                 <button type="submit" class="form-control btn btn-primary mr-sm-2" id="addTodobtn">
-                    Submit
+                    Add Todo
                 </button>
             </div>
         </form>
@@ -23,7 +23,7 @@
                     Incomplete Todo Items
                 </h5>
                 <hr />
-                <div class="list-group flex-wrap" id="incompleteTodo">
+                <div class="list-group" id="incompleteTodo">
                 </div>
                 <hr>
                 <nav aria-label="..." id="incompletePagination">

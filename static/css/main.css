@@ -3,6 +3,16 @@
     margin: 0;
 }
 
+.content-section {
+    width: 50% !important;
+    margin-left: 22%;
+    margin-right: 22%;
+}
+
+legend {
+    text-align: center;
+}
+
 button {
     display: flex;
 }
@@ -98,4 +108,12 @@ section {
 #title {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
+}
+
+.form-control {
+    border: 1px solid #343a40 !important;
+}
+
+.form-control:focus {
+    border-color: #007bff !important;
 }

@@ -320,7 +320,7 @@ $(document).ready(function() {
                             }
                         })(taskItems[task]))
 
-                        if(taskItems[task].completed===true){
+                        if(taskItems[task].completed === true) {
                             $(`#task_${taskItems[task].id}`).removeClass("list-group-item-danger")
                             $(`#task_${taskItems[task].id}`).addClass("list-group-item-dark")
                             $(`#edit-task_${taskItems[task].id}`).remove()
@@ -428,7 +428,6 @@ $(document).ready(function() {
 
             },
             error: function(err) {
-                alert("check the console for errors");
                 console.log(err);
             }
         })
