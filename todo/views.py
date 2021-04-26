@@ -45,14 +45,12 @@ def list(request):
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'All Todo Items': '/api/todo-list/',
-        'Todo Items Incomplete': '/api/todo-list-incomplete/',
-        'Todo Items Completed': '/api/todo-list-completed/',
+        'Paginated Todo Items Incomplete': '/api/todo-incomplete/?incomplete=1',
+        'Paginated Todo Items Completed': '/api/todo-completed/',
         'Specific Todo Item': '/api/todo-list/<int:todo_id>/',
         'Create new Todo Item': '/api/create-todo/',
         'Update already exists Todo item': '/api/update-todo/<int:todo_id>/',
         'Delete Specific Todo Item': '/api/delete-todo/<int:todo_id>/',
-        'All Task Items': '/api/task-list/',
         'Specific Task Item': '/api/task-list/<int:taskid>/',
         'Create new Task Item': '/api/create-task/',
         'Update already exists Task item': '/api/update-task/<int:task_id>/',
@@ -61,60 +59,9 @@ def apiOverview(request):
     return Response(api_urls)
 
 
-@api_view(['GET'])
-def todoList(request):
-    todo = Todo.objects.filter(user_id=request.user).order_by('-date_created')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def todoListIncomplete(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=False).order_by('completed')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def todoListCompleted(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=True).order_by('-date_created')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def taskList(request):
-    task = Task.objects.filter(user_id=request.user)
-    serializer = TaskSerializer(task, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def todoListView(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    serializer = TodoSerializer(todo, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def taskListView(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    serializer = TaskSerializer(task, many=False)
-    return Response(serializer.data)
-
-
 @api_view(['POST'])
 def createTodo(request):
     serializer = TodoSerializer(data=request.data)
-
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
@@ -136,7 +83,6 @@ def updateTodo(request, todo_id):
         todo = Todo.objects.get(id=todo_id, user_id=request.user)
     except Exception as e:
         return HttpResponse(e)
-
     serializer = TodoSerializer(instance=todo, data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -153,7 +99,6 @@ def completeTodoTask(request, todo_id):
     todo.tasks.filter(completed=False).update(completed=True)
     todo.completed = True
     todo.save()
-
     serializer = TodoSerializer(instance=todo, data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -185,7 +130,6 @@ def updateTask(request, task_id):
         task = Task.objects.get(id=task_id, user_id=request.user)
     except Exception as e:
         return HttpResponse(e)
-
     serializer = TaskSerializer(instance=task, data=request.data)
     if serializer.is_valid():
         serializer.save()

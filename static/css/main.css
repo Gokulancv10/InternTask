@@ -7,7 +7,7 @@ button {
     display: flex;
 }
 
-#id_title {
+.title-input {
     width: 300%;
     padding: 6px 20px;
     margin: 8px 0;

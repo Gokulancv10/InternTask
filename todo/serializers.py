@@ -9,7 +9,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'heading', 'date_created',
+                  'todo', 'completed', 'user']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,3 +28,10 @@ class TodoSerializer(WritableNestedModelSerializer,
         model = Todo
         fields = ['id', 'title', 'date_created',
                   'completed', 'user_id', 'tasks']
+                  
+
+class ResgisterUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'password2']

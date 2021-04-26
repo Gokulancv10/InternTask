@@ -7,7 +7,7 @@
     <div id="addTodoForm">
         <form action="" method="">
             <div class="input-group-append">
-                <input type="text" id="id_title" required name='title'>
+                <input type="text" class="title-input" required name="title" placeholder="e.g. Chemistry">
                 <button type="submit" class="form-control btn btn-primary mr-sm-2" id="addTodobtn">
                     Submit
                 </button>
@@ -32,7 +32,7 @@
                             <button class="page-link" tabindex="-1" id="prevPageI">&laquo</button>
                         </li>
                         <li class="page-item"><button class="page-link" id="currPageI">1</button></li>
-                        <li class="page-item"><button class="page-link" id="nextPageI" >&raquo</button></li>
+                        <li class="page-item"><button class="page-link" id="nextPageI">&raquo</button></li>
                     </ul>
                 </nav>
             </div>
@@ -61,5 +61,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

@@ -15,11 +15,6 @@ urlpatterns = [
     path('api/', views.apiOverview, name="apiOverview"),
 
     # API for Todo items
-    path('api/todo-list/', views.todoList, name='todoListAPI'),
-    path('api/todo-list-incomplete/', views.todoListIncomplete,
-         name='todoListIncompletedAPI'),
-    path('api/todo-list-completed/', views.todoListCompleted,
-         name='todoListCompletedAPI'),
     path('api/todo-list/<int:todo_id>/',
          views.todoListView, name="todoListViewAPI"),
     path('api/create-todo/', views.createTodo, name="createTodoAPI"),
@@ -31,7 +26,6 @@ urlpatterns = [
     path('api/complete-task/<int:task_id>/', views.completeTask),
 
     # API for Task items
-    path('api/task-list/', views.taskList, name='taskListAPI'),
     path('api/task-list/<int:task_id>/',
          views.taskListView, name="taskListViewAPI"),
     path('api/create-task/', views.createTask, name="createTaskAPI"),
@@ -40,8 +34,8 @@ urlpatterns = [
     path('api/delete-task/<int:task_id>/',
          views.deleteTask, name="taskDeleteAPI"),
 
-    # API - Incomplete Todo Items for Pagination
+    # API - Paginated Incomplete Todo Items
     path('api/todo-incomplete/', views.todoIncomplete, name='todoIncomplete'),
-    # API - Completed Todo Items for Pagination 
+    # API - Paginated Completed Todo Items 
     path('api/todo-completed/', views.todoCompleted, name='todoIncomplete')
 ]

@@ -19,7 +19,7 @@ function taskStatus(item) {
         ${item.map(task =>
             `
             <div class="card list-group-item list-group-item-danger mt-1" id="task_${task.id}">
-                <span class='font-italic'>${task.heading}</span>
+                <span class="font-italic">${task.heading}</span>
                 <div class="float-right">
                     <badge type="submit" class="badge badge-light" id="complete-task_${task.id}">
                         &#10004;
@@ -28,9 +28,12 @@ function taskStatus(item) {
                         ❌
                     </badge>
                 </div>
-                <div class='float-right'>
-                    <badge type="submit" class="badge badge-dark mr-1 edit-task" id="edit-task_${task.id}"
-                    data-target="#updateTaskModal_${task.id}" data-toggle="modal">
+                <div class="float-right">
+                    <badge type="submit"
+                            class="badge badge-dark mr-1 edit-task"
+                            id="edit-task_${task.id}"
+                            data-target="#updateTaskModal_${task.id}"
+                            data-toggle="modal">
                         edit
                     </badge>
 
@@ -72,8 +75,8 @@ function taskCompleted(item) {
         ${item.map(task => 
             `
             <div class="list-group-item bg-danger mb-1">
-                <span class='text-light font-italic'>${task.heading}</span>
-                <div class='float-right'>
+                <span class="text-light font-italic">${task.heading}</span>
+                <div class="float-right">
                     <badge type="submit" class="badge badge-warning ml-1" id="delete-task_${task.id}">
                         ❌
                     </badge>
@@ -85,52 +88,51 @@ function taskCompleted(item) {
 };
 
 $(document).ready(function() {
-    var incompleteHome = '/api/todo-incomplete/?incomplete=1';
-    var completedHome = '/api/todo-completed/?completed=1';
+    const incompleteHome = '/api/todo-incomplete/?incomplete=1';
+    const completedHome = '/api/todo-completed/?completed=1';
     todoIncompleteItems(incompleteHome);
     todoCompletedItems(completedHome);
     // Create Todo Item
     $('#addTodobtn').click(function(e) {
         e.preventDefault();
-        var title = $('#id_title').val()
-        var user_id = $('#welcome').data('id')
+        var title = $(".title-input").val();
+        var user_id = $('#welcome').data('id');
         console.log("Title: ", title)
         $.ajax({
-            url: 'api/create-todo/',
+            url: "api/create-todo/",
             type: "POST",
             data: {
-                'title': title,
-                'user_id': user_id,
-                'csrfmiddlewaretoken': csrftoken,
+                "title": title,
+                "user_id": user_id,
+                "csrfmiddlewaretoken": csrftoken,
             },
             success: function(data) {
-                console.log("Create Todo Item Success: ", data)
-                document.getElementById('incompleteTodo').innerHTML = '';
+                $("#incompleteTodo").html('');
                 todoIncompleteItems(incompleteHome);
             },
             error: function(err) {
+                alert("check the console for errors");
                 console.log("Create Todo Item Error: ", err)
             }
         })
-        $('#id_title').val('');
+        $(".title-input").val('');
     })
 
-    var nextUrlI = null;
-    var prevUrlI = null;
+    var nextIncomplete = null;
+    var prevIncomplete = null;
     var currentPageIncomplete = null;
+    var currentIncomplete = null;
+
     $('#nextPageI').click(function() {
-        var page = nextUrlI.slice(nextUrlI.length - 1)
-        $('#currPageI').html(page)
-        todoIncompleteItems(nextUrlI);
+        currentIncomplete +=1
+        $('#currPageI').html(currentIncomplete)
+        todoIncompleteItems(nextIncomplete);
     })
 
     $('#prevPageI').click(function() {
-        var page = prevUrlI.slice(prevUrlI.length - 1)
-        if (page == '/') {
-            page = '1'
-        }
-        $('#currePageI').html(page)
-        todoIncompleteItems(prevUrlI);
+        currentIncomplete -= 1
+        $('#currPageI').html(currentIncomplete)
+        todoIncompleteItems(prevIncomplete);
     })
 
     // Page wise Incomplete Todo Items
@@ -139,33 +141,36 @@ $(document).ready(function() {
         $.ajax({
             url: incompleteUrl,
             type: 'GET',
+            data:{
+                "csrfmiddlewaretoken": csrftoken
+            },
             success: function(data) {
-                currentPageIncomplete = `api/todo-incomplete/?incomplete=${data.current_page_no}`
-                nextUrlI = data.next;
+                currentPageIncomplete = `api/todo-incomplete/?incomplete=${data.current_page_no}`;
+                currentIncomplete = data.current_page_no;
+
+                nextIncomplete = data.next;
                 if (data.next != null) {
                     $('#nextPageI').css("visibility", "visible")
-                    $('#currPageI').css("visibility", "visible")
 
                 } else {
                     $('#nextPageI').css("visibility", "hidden")
                 }
 
-                prevUrlI = data.previous;
+                prevIncomplete = data.previous;
                 if (data.previous != null) {
                     $('#prevPageI').css("visibility", "visible")
-                    $('#currPageI').css("visibility", "visible")
                 } else {
                     $('#prevPageI').css("visibility", "hidden")
                 }
 
                 if (data.next === null && data.previous === null) {
-                    $('#currPageI').css("visibility", "hidden")
+                    $('#incompletePagination').css("visibility", "hidden")
                 } else {
-                    $('#currPageI').css("visibility", "vidible")
+                    $('#incompletePagination').css("visibility", "vidible")
                 }
 
-                var todoItems = data.results
-                for (var todo in todoItems) {
+                let todoItems = data.results;
+                for (let todo in todoItems) {
                     $('#incompleteTodo').append(
                         `<div class="list-group-item list-group-item-primary mb-1" id="todo-${todo}"
                             data-id="${todoItems[todo].id}">
@@ -262,10 +267,10 @@ $(document).ready(function() {
                     )
                 };
                 for (var todo in todoItems) {
-                    var deleteTodoBtn = document.getElementById(`deleteTodo_${todoItems[todo].id}`)
-                    var taskSubmitBtn = document.getElementById(`taskSubmit_${todoItems[todo].id}`)
-                    var editTodoBtn = document.getElementById(`updateModalSubmit_${todoItems[todo].id}`)
-                    var completedTodoBtn = document.getElementById(`completed-todo_${todoItems[todo].id}`)
+                    var deleteTodoBtn = document.querySelector(`#deleteTodo_${todoItems[todo].id}`)
+                    var taskSubmitBtn = document.querySelector(`#taskSubmit_${todoItems[todo].id}`)
+                    var editTodoBtn = document.querySelector(`#updateModalSubmit_${todoItems[todo].id}`)
+                    var completedTodoBtn = document.querySelector(`#completed-todo_${todoItems[todo].id}`)
 
                     deleteTodoBtn.addEventListener('click', (function(element) {
                         return function() {
@@ -293,9 +298,9 @@ $(document).ready(function() {
 
                     var taskItems = todoItems[todo].tasks
                     for (var task in taskItems) {
-                        var deleteTaskBtn = document.getElementById(`delete-task_${taskItems[task].id}`)
-                        var completeTaskBtn = document.getElementById(`complete-task_${taskItems[task].id}`)
-                        var editTaskBtn = document.getElementById(`updateTaskModalSubmit_${taskItems[task].id}`)
+                        var deleteTaskBtn = document.querySelector(`#delete-task_${taskItems[task].id}`)
+                        var completeTaskBtn = document.querySelector(`#complete-task_${taskItems[task].id}`)
+                        var editTaskBtn = document.querySelector(`#updateTaskModalSubmit_${taskItems[task].id}`)
 
                         deleteTaskBtn.addEventListener('click', (function(element) {
                             return function() {
@@ -332,34 +337,34 @@ $(document).ready(function() {
 
     var nextCompleted = null;
     var prevCompleted = null;
+    var currentPageCompleted = null;
     var currentCompleted = null;
     $('#nextPageC').click(function() {
-        var page = nextCompleted.slice(nextCompleted.length - 1)
-        $('#currPageC').html(page)
+        currentCompleted +=1
+        $('#currPageC').html(currentCompleted)
         todoCompletedItems(nextCompleted);
     })
 
     $('#prevPageC').click(function() {
-        var page = prevCompleted.slice(prevCompleted.length - 1)
-        if (page === '/') {
-            page = 1;
-        }
-        $('#currPageC').html(page)
+        currentCompleted -=1
+        $('#currPageC').html(currentCompleted)
         todoCompletedItems(prevCompleted);
     })
     // Page wise Completed Todo Items
     function todoCompletedItems(CompletedUrl) {
         $('#completedTodo').html('');
-
         $.ajax({
             url: CompletedUrl,
             type: 'GET',
+            data:{
+                "csrfmiddlewaretoken": csrftoken
+            },
             success: function(data) {
-                var todoItems = data.results;
-                nextCompleted = data.next;
-                prevCompleted = data.previous;
-                currentCompleted = `api/todo-completed/?completed=${data.current_page_no}`
+                var todoItems = data.results;  
+                currentPageCompleted = `api/todo-completed/?completed=${data.current_page_no}`
+                currentCompleted = data.current_page_no
 
+                nextCompleted = data.next;
                 if (data.next != null) {
                     $('#nextPageC').css("visibility", "visible")
 
@@ -367,6 +372,7 @@ $(document).ready(function() {
                     $('#nextPageC').css("visibility", "hidden")
                 }
 
+                prevCompleted = data.previous;
                 if (data.previous != null) {
                     $('#prevPageC').css("visibility", "visible")
                 } else {
@@ -422,13 +428,13 @@ $(document).ready(function() {
 
             },
             error: function(err) {
-                console.log(err)
+                alert("check the console for errors");
+                console.log(err);
             }
         })
     }
 
     function editTodoItem(item) {
-        stateSave: true
         var user_id = $('#welcome').data('id');
         var title = $(`#updateTodoInp_${item.id}`).val();
         $.ajax({
@@ -443,6 +449,7 @@ $(document).ready(function() {
                 todoIncompleteItems(currentPageIncomplete);
             },
             error: function(data) {
+                alert("check the console for errors")
                 console.log('Problem in updating todo item: ', data)
             }
         })
@@ -464,6 +471,7 @@ $(document).ready(function() {
                 todoIncompleteItems(currentPageIncomplete);
             },
             error: function(data) {
+                alert("check the console for errors")
                 console.log('Problem in adding new task item: ', data)
             }
         })
@@ -482,16 +490,16 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(completedHome);
             },
             error: function(data) {
+                alert("check the console for errors")
                 console.log('Problem in Completing Todo item: ', data)
             }
         })
     }
 
     function deleteTodo(item) {
-        console.log('Delete Todo Button Clicked: ', item.title)
         $.ajax({
             url: `api/delete-todo/${item.id}/`,
             type: 'DELETE',
@@ -500,9 +508,10 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
+                alert("check the console for errors")
                 console.log("There was an error while deleting Todo Item: ", data)
             }
         })
@@ -525,6 +534,7 @@ $(document).ready(function() {
                 todoIncompleteItems(currentPageIncomplete);
             },
             error: function(err) {
+                alert("check the console for errors")
                 console.log("There was an error while deleting Task Item: ", data)
             }
         })
@@ -545,7 +555,7 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(completedHome);
             },
             error: function(data) {
                 console.log('Problem in Completing Task item: ', data)
@@ -563,9 +573,10 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
+                alert("check the console for errors")
                 console.log("There was an error while deleting Task Item: ", data)
             }
         })
