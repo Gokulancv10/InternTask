@@ -7,10 +7,13 @@
     <div id="addTodoForm">
         <form action="" method="">
             <div class="input-group-append">
-                <input type="text" class="title-input" required name="title" placeholder="e.g. Chemistry">
+                <input type="text" id="title-input" required name="title" placeholder="e.g. Chemistry">
                 <button type="submit" class="form-control btn btn-primary mr-sm-2" id="addTodobtn">
                     Add Todo
                 </button>
+            </div>
+            <div id="form-validators">
+                <small class="text-left font-weight-bold m-0 p-0" id="addTodo-valid"></small>
             </div>
         </form>
     </div>
@@ -22,6 +25,7 @@
                 <h5 class="card-title">
                     Incomplete Todo Items
                 </h5>
+                <small class="font-weight-bold" id="validations"></small>
                 <hr />
                 <div class="list-group" id="incompleteTodo">
                 </div>
@@ -44,6 +48,7 @@
                 <h5 class="card-title">
                     Completed Todo Items
                 </h5>
+                <small class="font-weight-bold" id="valid-completed"></small>
                 <hr>
                 <div class="list-group" id="completedTodo">
                 </div>

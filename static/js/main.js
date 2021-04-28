@@ -37,7 +37,7 @@ function taskStatus(item) {
                         edit
                     </badge>
 
-                    <div class="modal fade" id="updateTaskModal_${task.id}" tabindex="-1" role="dialog"
+                    <div class="modal fade modal_${task.id}" id="updateTaskModal_${task.id}" tabindex="-1" role="dialog"
                             aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -47,19 +47,24 @@ function taskStatus(item) {
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="list-group-item list-group-item-warning">
-                                        <input type="text" required id='updateTaskInp_${task.id}' size='45'
-                                            name="heading_${task.id}" value="${task.heading}">
+                                <form action="">
+                                    <div class="modal-body">
+                                        <div class="list-group-item list-group-item-warning">
+                                            <input type="text" class="text-center ml-3" 
+                                                required id="updateTaskInp_${task.id}" size="45"
+                                                name="heading_${task.id}" value="${task.heading}">
+                                        </div>
                                     </div>
-                                </div>
                                     <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" id="updateTaskModalSubmit_${task.id}"
-                                        data-dismiss="modal">
-                                        Submit
-                                    </button>
-                                </div>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="updateTaskModalSubmit_${task.id}"
+                                            data-dismiss="modal">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -88,16 +93,34 @@ function taskCompleted(item) {
 };
 
 $(document).ready(function() {
-    const incompleteHome = '/api/todo-incomplete/?incomplete=1';
-    const completedHome = '/api/todo-completed/?completed=1';
+    const incompleteHome = "/api/todo-incomplete/?incomplete=1";
+    const completedHome = "/api/todo-completed/?completed=1";
     todoIncompleteItems(incompleteHome);
     todoCompletedItems(completedHome);
     // Create Todo Item
     $('#addTodobtn').click(function(e) {
         e.preventDefault();
-        var title = $(".title-input").val();
-        var user_id = $('#welcome').data('id');
-        console.log("Title: ", title)
+        var title = $("#title-input").val();
+        var user_id = $("#welcome").data("id");
+        if (title.length === 0) {
+            $("#addTodo-valid").html("Field cannot be empty! Write something.");
+            $("#addTodo-valid").addClass("text-danger ml-2");
+            $("#title-input").addClass("rounded border border-danger");
+            setTimeout(() => {
+                $("#addTodo-valid").html("");
+                $("#addTodo-valid").removeClass("text-danger ml-2");
+                $("#title-input").removeClass("rounded border border-danger");
+            }, 2000);
+        } else {
+            $("#addTodo-valid").html(`Todo item - <big class="font-italic">${title}</big> added successfully!`);
+            $("#addTodo-valid").addClass("text-success ml-2");
+            $("#title-input").addClass("rounded border border-success");
+            setTimeout(() => {
+                $("#addTodo-valid").html("");
+                $("#addTodo-valid").removeClass("text-success ml-2");
+                $("#title-input").removeClass("rounded border border-success");
+            }, 2300);
+        }
         $.ajax({
             url: "api/create-todo/",
             type: "POST",
@@ -116,7 +139,7 @@ $(document).ready(function() {
                 console.log("Create Todo Item Error: ", err)
             }
         })
-        $(".title-input").val('');
+        $("#title-input").val("");
     })
 
     var nextIncomplete = null;
@@ -127,7 +150,7 @@ $(document).ready(function() {
 
     $('#nextPageI').click(function() {
         currentIncomplete +=1
-        $('#currPageI').html(currentIncomplete)
+        $("#currPageI").html(currentIncomplete)
         todoIncompleteItems(nextIncomplete);
     })
 
@@ -209,7 +232,8 @@ $(document).ready(function() {
                                             </div>
                                             <div class="modal-body">
                                                 <div class="list-group-item list-group-item-warning">
-                                                    <input type="text" id='updateTodoInp_${todoItems[todo].id}'
+                                                    <input type="text" class="text-center ml-3" 
+                                                        id="updateTodoInp_${todoItems[todo].id}"
                                                         size="45" value="${todoItems[todo].title}">
                                                 </div>
                                             </div>
@@ -246,7 +270,8 @@ $(document).ready(function() {
                                             </div>
                                             <div class="modal-body">
                                                 <div class="list-group-item list-group-item-dark">
-                                                    <input type="text" required id='addTaskInp_${todoItems[todo].id}' size="45"
+                                                    <input type="text"  class="text-center ml-3"
+                                                        required id="addTaskInp_${todoItems[todo].id}" size="45"
                                                         name="heading" placeholder="Enter the task name here...">
                                                 </div>  
                                             </div>
@@ -288,6 +313,12 @@ $(document).ready(function() {
                     deleteTodoBtn.addEventListener('click', (function(element) {
                         return function() {
                             deleteTodo(element)
+                            $("#validations").addClass("text-danger")
+                            $("#validations").html(`Todo <em>${element.title}</em> was Deleted!`)
+                            setTimeout(() => {
+                                $("#validations").html("")
+                                $("#validations").removeClass("text-danger")
+                            }, 2000)
                         }
                     })(todoItems[todo]))
 
@@ -318,18 +349,30 @@ $(document).ready(function() {
                         deleteTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 deleteTask(element)
+                                $("#validations").addClass("text-danger");
+                                $("#validations").html(`Task Deleted <em>${element.heading}</em>`);
+                                setTimeout(() => {
+                                    $("#validations").html("");
+                                    $("#validations").removeClass("text-success");
+                                }, 2000);
                             }
                         })(taskItems[task]))
 
                         completeTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 completedTask(element)
+                                $("#validations").addClass("text-success")
+                                $("#validations").html(`Task Item <em>${element.heading}</em> marked completed`)
+                                setTimeout(() => {
+                                    $("#validations").html("")
+                                    $("#validations").removeClass("text-success")
+                                }, 2000)
                             }
                         })(taskItems[task]))
 
                         editTaskBtn.addEventListener('click', (function(element) {
                             return function() {
-                                editTaskItem(element)
+                                editTaskItem(element);
                             }
                         })(taskItems[task]))
 
@@ -343,7 +386,6 @@ $(document).ready(function() {
                 }
             },
             error: function(err) {
-                console.log(err)
             }
         });
     }
@@ -432,9 +474,15 @@ $(document).ready(function() {
                 for (var todo in todoItems) {
                     var deleteTodoBtn = document.getElementById(`deleteTodo_${todoItems[todo].id}`)
 
-                    deleteTodoBtn.addEventListener('click', (function(item) {
+                    deleteTodoBtn.addEventListener('click', (function(element) {
                         return function() {
-                            deleteTodo(item)
+                            deleteTodo(element)
+                            $("#valid-completed").addClass("text-danger")
+                            $("#valid-completed").html(`Todo Deleted <em>${element.title}</em>`)
+                            setTimeout(() => {
+                                $("#valid-completed").html("")
+                                $("#valid-completed").removeClass("text-danger")
+                            }, 2000)
                         }
                     })(todoItems[todo]))
 
@@ -445,20 +493,26 @@ $(document).ready(function() {
                         deleteTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 deleteTask(element)
+                                $("#valid-completed").addClass("text-danger")
+                                $("#valid-completed").html(
+                                    `Task <em>${element.heading}</em> Deleted`
+                                )
+                                setTimeout(() =>{
+                                    $("#valid-completed").html("")
+                                    $("#valid-completed").removeClass("text-danger")
+                                }, 2000)
                             }
                         })(taskItems[task]))
                     }
                 }
-
             },
             error: function(err) {
-                console.log(err);
             }
         })
     }
 
     function editTodoItem(item) {
-        var user_id = $('#welcome').data('id');
+        var user_id = $("#welcome").data("id");
         var title = $(`#updateTodoInp_${item.id}`).val();
         $.ajax({
             url: `api/update-todo/${item.id}/`,
@@ -467,15 +521,34 @@ $(document).ready(function() {
                 "X-CSRFToken":csrftoken
             },
             data: {
-                'title': title,
-                'user_id': user_id,
+                "title": title,
+                "user_id": user_id,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (title.length === 0) {
+                    $("#validations").addClass("text-danger");
+                    $("#validations").html(
+                        `Input Field cannot be empty! Previous value
+                            <em>${item.title}</em> saved.`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 3000);
+                } else {
+                    $("#validations").addClass("text-success");
+                    $("#validations").html(
+                        `Todo updated from <em>${item.title}</em> tod <em>${title}</em>`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 3000);
+                }
             },
             error: function(data) {
-                alert("check the console for errors")
-                console.log('Problem in updating todo item: ', data)
             }
         })
     }
@@ -494,10 +567,28 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (heading.length === 0) {
+                    $("#validations").addClass("text-danger");
+                    $("#validations").html(
+                        `Input Field cannot be empty!`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 2000);
+                } else {
+                    $("#validations").addClass("text-success");
+                    $("#validations").html(
+                        `Created new Task <em>${heading}</em> for <em>${item.title}</em>`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 2000);
+                }
             },
             error: function(data) {
-                alert("check the console for errors")
-                console.log('Problem in adding new task item: ', data)
             }
         })
     }
@@ -518,10 +609,14 @@ $(document).ready(function() {
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
                 todoCompletedItems(completedHome);
+                $("#validations").html(`Todo Item <em>${item.title}</em> marked completed`)
+                $("#validations").addClass("text-danger");
+                setTimeout(() => {
+                    $("#validations").html("")
+                    $("#validations").removeClass("text-danger");
+                }, 2000)
             },
             error: function(data) {
-                alert("check the console for errors")
-                console.log('Problem in Completing Todo item: ', data)
             }
         })
     }
@@ -538,8 +633,6 @@ $(document).ready(function() {
                 todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
-                alert("check the console for errors")
-                console.log("There was an error while deleting Todo Item: ", data)
             }
         })
     }
@@ -561,10 +654,32 @@ $(document).ready(function() {
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (heading.length === 0){
+                    $("#validations").html(
+                        `<medium class="text-danger">
+                            Field Cannot be empty! So, previous value saved.
+                        <medium>`
+                    );
+                    $("#validations").addClass("text-danger");
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 2000)
+                } else {
+                    $("#validations").html(
+                        `<medium class="text-success">Updated Task item from
+                            <em>${item.heading}</em> to <em>${heading}</em></medium>
+                        `
+                    );
+                    $("#validations").addClass("text-success");
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 2000)
+                }
             },
             error: function(err) {
-                alert("check the console for errors")
-                console.log("There was an error while deleting Task Item: ", data)
             }
         })
     }
@@ -587,13 +702,11 @@ $(document).ready(function() {
                 todoCompletedItems(completedHome);
             },
             error: function(data) {
-                console.log('Problem in Completing Task item: ', data)
             }
         })
     }
 
     function deleteTask(item) {
-        console.log("Delete Task Button Clicked: ", item.heading)
         $.ajax({
             url: `api/delete-task/${item.id}/`,
             type: 'DELETE',
@@ -605,8 +718,6 @@ $(document).ready(function() {
                 todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
-                alert("check the console for errors")
-                console.log("There was an error while deleting Task Item: ", data)
             }
         })
     }

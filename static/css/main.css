@@ -17,7 +17,7 @@ button {
     display: flex;
 }
 
-.title-input {
+#title-input {
     width: 300%;
     padding: 6px 20px;
     margin: 8px 0;
