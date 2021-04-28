@@ -9,7 +9,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'heading', 'date_created',
+                  'todo', 'completed', 'user']
 
 
 class UserSerializer(serializers.ModelSerializer):

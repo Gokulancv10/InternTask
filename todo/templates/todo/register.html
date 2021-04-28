@@ -7,18 +7,19 @@
         <form action="" method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Join Today</legend>
                 {{ form | crispy }}
-
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-success" type="submit">Sign Up</button>
+                <button class="btn btn-sm btn-success" type="submit">Sign Up</button>
             </div>
         </form>
 
-        <div class="border-top pt-3">
-            <medium class="text">
-                Already Have an Account? <a href="{% url 'login' %}" class="ml-2"><button class="btn-sm btn-primary">Login</button></a>
+        <div class="border-top text-right pt-3">
+            <medium class="font-italic text-muted">
+                Already Have an Account?
+                <a href="{% url 'login' %}" class="btn btn-sm btn-primary ml-2">
+                    Login
+                </a>
             </medium>
         </div>
     </div>

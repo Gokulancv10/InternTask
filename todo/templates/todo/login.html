@@ -9,16 +9,17 @@
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Login</legend>
                 {{ form | crispy }}
-
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-info" type="submit">Login</button>
+                <button class="btn btn-outline-danger px-md-3 py-md-1" type="submit">Login</button>
             </div>
 
-            <div class="border-top pt-3">
+            <div class="border-top pt-3 text-right">
                 <medium class="text-muted">
-                    Don't Have an Account? <a href="{% url 'register' %}" class="ml-2">
-                        <button class="btn-sm btn-outline-primary">Sign Up</button></a>
+                    Don't Have an Account?
+                    <a href="{% url 'register' %}" class="btn btn-sm btn-outline-dark ml-2 px-md-3 py-md-1">
+                        Sign Up
+                    </a>
                 </medium>
             </div>
         </form>

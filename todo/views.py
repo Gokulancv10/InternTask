@@ -1,217 +1,188 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.utils import timezone
+from django.http import HttpResponse, Http404
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
-from django.contrib.auth.models import User
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView
 
 from .models import Todo, Task
-from .forms import TodoForm, TaskForm, UserRegisterForm
-from .serializers import TodoSerializer, TaskSerializer, UserSerializer
+from .forms import UserRegisterForm
+from .serializers import TodoSerializer, TaskSerializer
 
 
-def register(request):
-
-    form = UserRegisterForm()
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
+class RegisterUser(View):
+    
+    def get(self, request):
         form = UserRegisterForm()
-    context = {'form': form}
-    return render(request, 'todo/register.html', context)
+        return render(request, 'todo/register.html', {'form': form})
+    
+    def post(self, request):
+        form = UserRegisterForm()
+        if request.method == 'POST':
+            form = UserRegisterForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('login')
+        else:
+            form = UserRegisterForm()
+        context = {'form': form}
+        return render(request, 'todo/register.html', context)
 
 
-def logout_user(request):
-
-    logout(request)
-    return redirect('login')
-
-
-@login_required
-def list(request):
-    return render(request, 'todo/main.html')
+class LogoutUser(View):
+    def get(self, request):
+        logout(request)
+        return redirect("login")
 
 
-@api_view(['GET'])
-def apiOverview(request):
-    api_urls = {
-        'All Todo Items': '/api/todo-list/',
-        'Todo Items Incomplete': '/api/todo-list-incomplete/',
-        'Todo Items Completed': '/api/todo-list-completed/',
-        'Specific Todo Item': '/api/todo-list/<int:todo_id>/',
-        'Create new Todo Item': '/api/create-todo/',
-        'Update already exists Todo item': '/api/update-todo/<int:todo_id>/',
-        'Delete Specific Todo Item': '/api/delete-todo/<int:todo_id>/',
-        'All Task Items': '/api/task-list/',
-        'Specific Task Item': '/api/task-list/<int:taskid>/',
-        'Create new Task Item': '/api/create-task/',
-        'Update already exists Task item': '/api/update-task/<int:task_id>/',
-        'Delete Specific Task Item': '/api/delete-task/<int:task_id>/',
-    }
-    return Response(api_urls)
+class Home(LoginRequiredMixin, View):
+    template_name = "todo/main.html"
+    
+    def get(self, request):
+        return render(request, self.template_name)
 
 
-@api_view(['GET'])
-def todoList(request):
-    todo = Todo.objects.filter(user_id=request.user).order_by('-date_created')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
+class APIOverView(LoginRequiredMixin, APIView):
+
+    def get(self, request):
+        api_urls = {
+            'Paginated Todo Incomplete Items': '/api/todo-incomplete/?incomplete=1',
+            'Paginated Todo Completed Items': '/api/todo-completed/?completed=1',
+            'Specific Todo Item': '/api/todo-list/<int:todo_id>/',
+            'Create new Todo Item': '/api/create-todo/',
+            'Update already exists Todo item': '/api/update-todo/<int:todo_id>/',
+            'Delete Specific Todo Item': '/api/delete-todo/<int:todo_id>/',
+            'All Task Items': '/api/task-list/',
+            'Specific Task Item': '/api/task-list/<int:taskid>/',
+            'Create new Task Item': '/api/create-task/',
+            'Update already exists Task item': '/api/update-task/<int:task_id>/',
+            'Delete Specific Task Item': '/api/delete-task/<int:task_id>/',
+        }
+        return Response(api_urls)
 
 
-@api_view(['GET'])
-def todoListIncomplete(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=False).order_by('completed')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
+class TodoItem(LoginRequiredMixin, APIView):
 
-
-@api_view(['GET'])
-def todoListCompleted(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=True).order_by('-date_created')
-    serializer = TodoSerializer(todo, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def taskList(request):
-    task = Task.objects.filter(user_id=request.user)
-    serializer = TaskSerializer(task, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def todoListView(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    serializer = TodoSerializer(todo, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def taskListView(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    serializer = TaskSerializer(task, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-def createTodo(request):
-    serializer = TodoSerializer(data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
+    def get(self, request, todo_id):
+        try:
+            todo = Todo.objects.get(id=todo_id, user_id=request.user)
+        except Exception as e:
+            raise Http404(e)
+        serializer = TodoSerializer(todo, many=False)
         return Response(serializer.data)
-    return Response(serializer.errors)
+
+    # Update Todo Item
+    def patch(self, request, todo_id):
+        try:
+            todo = Todo.objects.get(id=todo_id, user_id=request.user)
+        except Exception as e:
+            return HttpResponse(e)
+        serializer = TodoSerializer(instance=todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def delete(self, request, todo_id):
+        try:
+            todo = Todo.objects.get(id=todo_id, user_id=request.user)
+        except Exception as e:
+            raise Http404(e)
+        todo.tasks.all().delete()
+        todo.delete()
+        return HttpResponse("Deleted Todo Successfully!!")
 
 
-@api_view(['POST'])
-def createTask(request):
-    serializer = TaskSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
+class TaskItem(LoginRequiredMixin, APIView):
+
+    def get(self, request, task_id):
+        try:
+            task = Task.objects.get(id=task_id, user=request.user)
+        except Exception as e:
+            raise Http404(e)
+        serializer = TaskSerializer(task, many=False)
         return Response(serializer.data)
-    return Response(serializer.errors)
+
+    # Updated Task Item
+    def patch(self, request, task_id):
+        try:
+            task = Task.objects.get(id=task_id, user=request.user)
+        except Exception as e:
+            raise Http404(e)
+        serializer = TaskSerializer(instance=task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def delete(self, request, task_id):
+        try:
+            task = Task.objects.get(id=task_id, user=request.user)
+        except Exception as e:
+            raise Http404(e)
+        task.delete()
+        return HttpResponse("Deleted Task Successfully!!")
 
 
-@api_view(['POST'])
-def updateTodo(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
+class CreateTodo(LoginRequiredMixin, APIView):
 
-    serializer = TodoSerializer(instance=todo, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
+    def post(self, request):
+        serializer = TodoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 
-@api_view(['POST'])
-def completeTodoTask(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    todo.tasks.filter(completed=False).update(completed=True)
-    todo.completed = True
-    todo.save()
+class CreateTask(LoginRequiredMixin, APIView):
 
-    serializer = TodoSerializer(instance=todo, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 
-@api_view(['POST'])
-def completeTask(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    task.completed = True
-    task.save()
-    if task.todo.tasks.filter(completed=False).count() == 0:
-        task.todo.completed = True
-        task.todo.save()
-    serializer = TodoSerializer(instance=task, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
+class CompleteTodoItem(LoginRequiredMixin, APIView):
+
+    def patch(self, request, todo_id):
+        try:
+            todo = Todo.objects.get(id=todo_id, user_id=request.user)
+        except Exception as e:
+            return HttpResponse(e)
+        todo.tasks.filter(completed=False).update(completed=True)
+        todo.completed = True
+        todo.save()
+
+        serializer = TodoSerializer(instance=todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 
-@api_view(['POST'])
-def updateTask(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
+class CompleteTaskItem(LoginRequiredMixin, APIView):
 
-    serializer = TaskSerializer(instance=task, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
-
-
-@api_view(['DELETE'])
-def deleteTodo(request, todo_id):
-    try:
-        todo = Todo.objects.get(id=todo_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    todo.tasks.all().delete()
-    todo.delete()
-    return Response('Todo Deleted Successfully!!')
-
-
-@api_view(['DELETE'])
-def deleteTask(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id, user_id=request.user)
-    except Exception as e:
-        return HttpResponse(e)
-    task.delete()
-    return Response('Task Deleted Successfully!!')
+    def patch(self, request, task_id):
+        try:
+            task = Task.objects.get(id=task_id, user_id=request.user)
+        except Exception as e:
+            return HttpResponse(e)
+        task.completed = True
+        task.save()
+        if task.todo.tasks.filter(completed=False).count() == 0:
+            task.todo.completed = True
+            task.todo.save()
+        serializer = TodoSerializer(instance=task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 
 class IncompleteTodoPagination(PageNumberPagination):
@@ -221,7 +192,6 @@ class IncompleteTodoPagination(PageNumberPagination):
     max_page_size = 10
 
     def get_paginated_response(self, data):
-
         return Response({
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
@@ -240,7 +210,6 @@ class CompletedTodoPagination(PageNumberPagination):
     max_page_size = 10
 
     def get_paginated_response(self, data):
-
         return Response({
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
@@ -252,21 +221,24 @@ class CompletedTodoPagination(PageNumberPagination):
         })
 
 
-@api_view(['GET'])
-def todoIncomplete(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=False).order_by('-date_created')
-    paginator = IncompleteTodoPagination()
-    result_page = paginator.paginate_queryset(todo, request)
-    serializer = TodoSerializer(result_page, many=True)
-    return paginator.get_paginated_response(serializer.data)
+class TodoIncompletePagination(LoginRequiredMixin, APIView):
+
+    def get(self, request):
+        todo = Todo.objects.filter(
+            user_id=request.user, completed=False).order_by('-date_created')
+        paginator = IncompleteTodoPagination()
+        result_page = paginator.paginate_queryset(todo, request)
+        serializer = TodoSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
-@api_view(['GET'])
-def todoCompleted(request):
-    todo = Todo.objects.filter(
-        user_id=request.user, completed=True).order_by('-date_created')
-    paginator = CompletedTodoPagination()
-    result_page = paginator.paginate_queryset(todo, request)
-    serializer = TodoSerializer(result_page, many=True)
-    return paginator.get_paginated_response(serializer.data)
+class TodoCompletedPagination(LoginRequiredMixin, APIView):
+
+    def get(self, request):
+        todo = Todo.objects.filter(
+            user_id=request.user, completed=True).order_by('-date_created')
+        paginator = CompletedTodoPagination()
+        result_page = paginator.paginate_queryset(todo, request)
+        serializer = TodoSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    

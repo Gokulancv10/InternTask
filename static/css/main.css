@@ -7,7 +7,7 @@ button {
     display: flex;
 }
 
-#id_title {
+.title-input {
     width: 300%;
     padding: 6px 20px;
     margin: 8px 0;
@@ -98,4 +98,14 @@ section {
 #title {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
+}
+
+.content-section {
+    width: 50% !important;
+    margin-left: 22%;
+    margin-right: 22%;
+}
+
+legend {
+    text-align: center;
 }

@@ -1,3 +1,4 @@
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -19,7 +20,7 @@ function taskStatus(item) {
         ${item.map(task =>
             `
             <div class="card list-group-item list-group-item-danger mt-1" id="task_${task.id}">
-                <span class='font-italic'>${task.heading}</span>
+                <span class="font-italic">${task.heading}</span>
                 <div class="float-right">
                     <badge type="submit" class="badge badge-light" id="complete-task_${task.id}">
                         &#10004;
@@ -28,9 +29,12 @@ function taskStatus(item) {
                         ❌
                     </badge>
                 </div>
-                <div class='float-right'>
-                    <badge type="submit" class="badge badge-dark mr-1 edit-task" id="edit-task_${task.id}"
-                    data-target="#updateTaskModal_${task.id}" data-toggle="modal">
+                <div class="float-right">
+                    <badge type="submit"
+                            class="badge badge-dark mr-1 edit-task"
+                            id="edit-task_${task.id}"
+                            data-target="#updateTaskModal_${task.id}"
+                            data-toggle="modal">
                         edit
                     </badge>
 
@@ -46,7 +50,7 @@ function taskStatus(item) {
                                 </div>
                                 <div class="modal-body">
                                     <div class="list-group-item list-group-item-warning">
-                                        <input type="text" required id='updateTaskInp_${task.id}' size='50'
+                                        <input class="text-center ml-3" type="text" id="updateTaskInp_${task.id}" size="45"
                                             name="heading_${task.id}" value="${task.heading}">
                                     </div>
                                 </div>
@@ -72,8 +76,8 @@ function taskCompleted(item) {
         ${item.map(task => 
             `
             <div class="list-group-item bg-danger mb-1">
-                <span class='text-light font-italic'>${task.heading}</span>
-                <div class='float-right'>
+                <span class="text-left font-italic">${task.heading}</span>
+                <div class="float-right">
                     <badge type="submit" class="badge badge-warning ml-1" id="delete-task_${task.id}">
                         ❌
                     </badge>
@@ -85,91 +89,116 @@ function taskCompleted(item) {
 };
 
 $(document).ready(function() {
-    var incompleteHome = '/api/todo-incomplete/?incomplete=1';
-    var completedHome = '/api/todo-completed/?completed=1';
+    const incompleteHome = '/api/todo-incomplete/?incomplete=1';
+    const completedHome = '/api/todo-completed/?completed=1';
     todoIncompleteItems(incompleteHome);
     todoCompletedItems(completedHome);
     // Create Todo Item
     $('#addTodobtn').click(function(e) {
         e.preventDefault();
-        var title = $('#id_title').val()
-        var user_id = $('#welcome').data('id')
-        console.log("Title: ", title)
+        var title = $(".title-input").val();
+        if (title.length === 0) {
+            $("#addTodo-valid").html("Field cannot be empty! Write something.");
+            $("#addTodo-valid").addClass("text-danger ml-2");
+            $(".title-input").addClass("rounded border border-danger");
+            setTimeout(() => {
+                $("#addTodo-valid").html("");
+                $("#addTodo-valid").removeClass("text-danger ml-2");
+                $(".title-input").removeClass("rounded border border-danger");
+            }, 2000);
+        } else {
+            $("#addTodo-valid").html(`Todo item - <big class="font-italic">${title}</big> added successfully!`);
+            $("#addTodo-valid").addClass("text-success ml-2");
+            $(".title-input").addClass("rounded border border-success");
+            setTimeout(() => {
+                $("#addTodo-valid").html("");
+                $("#addTodo-valid").removeClass("text-success");
+                $(".title-input").removeClass("rounded border border-success");
+            }, 2300);
+        }
+        var user_id = $('#welcome').data('id');
         $.ajax({
-            url: 'api/create-todo/',
+            url: "api/create-todo/",
             type: "POST",
+            headers:{
+                'X-CSRFToken':csrftoken
+            },
             data: {
-                'title': title,
-                'user_id': user_id,
-                'csrfmiddlewaretoken': csrftoken,
+                "title": title,
+                "user_id": user_id,
             },
             success: function(data) {
-                console.log("Create Todo Item Success: ", data)
-                document.getElementById('incompleteTodo').innerHTML = '';
                 todoIncompleteItems(incompleteHome);
             },
             error: function(err) {
+                alert("Check the console for errors")
                 console.log("Create Todo Item Error: ", err)
             }
         })
-        $('#id_title').val('');
+        // $(".title-input").val('');
+        document.getElementById("todoForm").reset();
     })
 
-    var nextUrlI = null;
-    var prevUrlI = null;
+    var nextIncomplete = null;
+    var prevIncomplete = null;
     var currentPageIncomplete = null;
+    var currentIncomplete = null;
+    var todo_incomplete = [];
+
     $('#nextPageI').click(function() {
-        var page = nextUrlI.slice(nextUrlI.length - 1)
-        $('#currPageI').html(page)
-        todoIncompleteItems(nextUrlI);
+        currentIncomplete +=1
+        $('#currPageI').html(currentIncomplete)
+        todoIncompleteItems(nextIncomplete);
     })
 
     $('#prevPageI').click(function() {
-        var page = prevUrlI.slice(prevUrlI.length - 1)
-        if (page == '/') {
-            page = '1'
-        }
-        $('#currePageI').html(page)
-        todoIncompleteItems(prevUrlI);
+        currentIncomplete -= 1
+        $('#currPageI').html(currentIncomplete)
+        todoIncompleteItems(prevIncomplete);
     })
 
     // Page wise Incomplete Todo Items
     function todoIncompleteItems(incompleteUrl) {
-        $('#incompleteTodo').html('');
         $.ajax({
             url: incompleteUrl,
             type: 'GET',
             success: function(data) {
-                currentPageIncomplete = `api/todo-incomplete/?incomplete=${data.current_page_no}`
-                nextUrlI = data.next;
+                currentPageIncomplete = `api/todo-incomplete/?incomplete=${data.current_page_no}`;
+                currentIncomplete = data.current_page_no;
+                nextIncomplete = data.next;
                 if (data.next != null) {
                     $('#nextPageI').css("visibility", "visible")
-                    $('#currPageI').css("visibility", "visible")
 
                 } else {
                     $('#nextPageI').css("visibility", "hidden")
                 }
 
-                prevUrlI = data.previous;
+                prevIncomplete = data.previous;
                 if (data.previous != null) {
                     $('#prevPageI').css("visibility", "visible")
-                    $('#currPageI').css("visibility", "visible")
                 } else {
                     $('#prevPageI').css("visibility", "hidden")
                 }
 
                 if (data.next === null && data.previous === null) {
-                    $('#currPageI').css("visibility", "hidden")
+                    $('#incompletePagination').css("visibility", "hidden")
                 } else {
-                    $('#currPageI').css("visibility", "vidible")
+                    $('#incompletePagination').css("visibility", "visible")
                 }
 
-                var todoItems = data.results
-                for (var todo in todoItems) {
+                let todoItems = data.results;
+                for (let todo in todoItems) {
+
+                    try{
+                        document.getElementById(`todoI_${todo}`).remove()
+                    } catch(err){
+
+                    }
+
                     $('#incompleteTodo').append(
-                        `<div class="list-group-item list-group-item-primary mb-1" id="todo-${todo}"
+                        `<div class="list-group-item list-group-item-primary mb-1" id="todoI_${todo}"
                             data-id="${todoItems[todo].id}">
-                            <span class="font-weight-bold">${todoItems[todo].title}</span>
+                            <span class="text-left font-weight-bold">${todoItems[todo].title}</i></span>
                             <div class="float-right">
                                 <badge type="submit" class="badge badge-warning" id="deleteTodo_${todoItems[todo].id}">
                                     ❌
@@ -199,8 +228,8 @@ $(document).ready(function() {
                                             </div>
                                             <div class="modal-body">
                                                 <div class="list-group-item list-group-item-warning">
-                                                    <input type="text" id='updateTodoInp_${todoItems[todo].id}'
-                                                        size="50" value="${todoItems[todo].title}">
+                                                    <input type="text" class="text-center ml-3" id="updateTodoInp_${todoItems[todo].id}"
+                                                        size="45" value="${todoItems[todo].title}">
                                                 </div>
                                             </div>
                                                 <div class="modal-footer">
@@ -236,8 +265,8 @@ $(document).ready(function() {
                                             </div>
                                             <div class="modal-body">
                                                 <div class="list-group-item list-group-item-dark">
-                                                    <input type="text" required id='addTaskInp_${todoItems[todo].id}' size="50"
-                                                        name="heading" placeholder="Enter the task name here...">
+                                                    <input type="text" class="text-center ml-3" id="addTaskInp_${todoItems[todo].id}"
+                                                        size="45" name="heading" placeholder="Enter the task name here...">
                                                 </div>  
                                             </div>
                                             <div class="modal-footer">
@@ -261,15 +290,29 @@ $(document).ready(function() {
                         `
                     )
                 };
+
+                if(todo_incomplete.length > todoItems.length){
+                    for (var i = todoItems.length; i < todo_incomplete.length; i++){
+                        document.getElementById(`todoI_${i}`).remove()
+                    }
+                }
+                todo_incomplete = todoItems;
+
                 for (var todo in todoItems) {
-                    var deleteTodoBtn = document.getElementById(`deleteTodo_${todoItems[todo].id}`)
-                    var taskSubmitBtn = document.getElementById(`taskSubmit_${todoItems[todo].id}`)
-                    var editTodoBtn = document.getElementById(`updateModalSubmit_${todoItems[todo].id}`)
-                    var completedTodoBtn = document.getElementById(`completed-todo_${todoItems[todo].id}`)
+                    var deleteTodoBtn = document.querySelector(`#deleteTodo_${todoItems[todo].id}`)
+                    var taskSubmitBtn = document.querySelector(`#taskSubmit_${todoItems[todo].id}`)
+                    var editTodoBtn = document.querySelector(`#updateModalSubmit_${todoItems[todo].id}`)
+                    var completedTodoBtn = document.querySelector(`#completed-todo_${todoItems[todo].id}`)
 
                     deleteTodoBtn.addEventListener('click', (function(element) {
                         return function() {
                             deleteTodo(element)
+                            $("#validations").addClass("text-danger")
+                            $("#validations").html(`Todo <em>${element.title}</em> was Deleted!`)
+                            setTimeout(() => {
+                                $("#validations").html("")
+                                $("#validations").removeClass("text-danger")
+                            }, 3000)
                         }
                     })(todoItems[todo]))
 
@@ -293,19 +336,31 @@ $(document).ready(function() {
 
                     var taskItems = todoItems[todo].tasks
                     for (var task in taskItems) {
-                        var deleteTaskBtn = document.getElementById(`delete-task_${taskItems[task].id}`)
-                        var completeTaskBtn = document.getElementById(`complete-task_${taskItems[task].id}`)
-                        var editTaskBtn = document.getElementById(`updateTaskModalSubmit_${taskItems[task].id}`)
+                        var deleteTaskBtn = document.querySelector(`#delete-task_${taskItems[task].id}`)
+                        var completeTaskBtn = document.querySelector(`#complete-task_${taskItems[task].id}`)
+                        var editTaskBtn = document.querySelector(`#updateTaskModalSubmit_${taskItems[task].id}`)
 
                         deleteTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 deleteTask(element)
+                                $("#validations").addClass("text-danger");
+                                $("#validations").html(`Task Deleted <em>${element.heading}</em>`);
+                                setTimeout(() => {
+                                    $("#validations").html("");
+                                    $("#validations").removeClass("text-success");
+                                }, 2000);
                             }
                         })(taskItems[task]))
 
                         completeTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 completedTask(element)
+                                $("#validations").addClass("text-success")
+                                $("#validations").html(`Task Item <em>${element.heading}</em> marked completed`)
+                                setTimeout(() => {
+                                    $("#validations").html("")
+                                    $("#validations").removeClass("text-success")
+                                }, 2000)
                             }
                         })(taskItems[task]))
 
@@ -325,6 +380,7 @@ $(document).ready(function() {
                 }
             },
             error: function(err) {
+                alert("check the console for errors")
                 console.log(err)
             }
         });
@@ -332,34 +388,31 @@ $(document).ready(function() {
 
     var nextCompleted = null;
     var prevCompleted = null;
+    var currentPageCompleted = null;
     var currentCompleted = null;
+    var todo_completed = [];
     $('#nextPageC').click(function() {
-        var page = nextCompleted.slice(nextCompleted.length - 1)
-        $('#currPageC').html(page)
+        currentCompleted +=1
+        $('#currPageC').html(currentCompleted)
         todoCompletedItems(nextCompleted);
     })
 
     $('#prevPageC').click(function() {
-        var page = prevCompleted.slice(prevCompleted.length - 1)
-        if (page === '/') {
-            page = 1;
-        }
-        $('#currPageC').html(page)
+        currentCompleted -=1
+        $('#currPageC').html(currentCompleted)
         todoCompletedItems(prevCompleted);
     })
     // Page wise Completed Todo Items
     function todoCompletedItems(CompletedUrl) {
-        $('#completedTodo').html('');
-
         $.ajax({
             url: CompletedUrl,
             type: 'GET',
             success: function(data) {
-                var todoItems = data.results;
-                nextCompleted = data.next;
-                prevCompleted = data.previous;
-                currentCompleted = `api/todo-completed/?completed=${data.current_page_no}`
+                var todoItems = data.results;  
+                currentPageCompleted = `api/todo-completed/?completed=${data.current_page_no}`
+                currentCompleted = data.current_page_no
 
+                nextCompleted = data.next;
                 if (data.next != null) {
                     $('#nextPageC').css("visibility", "visible")
 
@@ -367,6 +420,7 @@ $(document).ready(function() {
                     $('#nextPageC').css("visibility", "hidden")
                 }
 
+                prevCompleted = data.previous;
                 if (data.previous != null) {
                     $('#prevPageC').css("visibility", "visible")
                 } else {
@@ -380,11 +434,18 @@ $(document).ready(function() {
                 }
 
                 for (var todo in todoItems) {
+
+                    try {
+                        document.getElementById(`todoC_${todo}`).remove()
+                    } catch(err){
+
+                    }
+
                     $('#completedTodo').append(
                         `
                         <div class="list-group-item bg-success mb-1"
-                            id="todo_${todoItems[todo].id}" data-id="${todoItems[todo].id}">
-                            <span class="text-light font-weight-bold">${todoItems[todo].title}</span>
+                            id="todoC_${todo}" data-id="${todoItems[todo].id}">
+                            <span class="text-left font-weight-bold">${todoItems[todo].title}</span>
                             <div class="float-right">
                                 <badge type="submit" class="badge badge-warning mr-2"
                                     id="deleteTodo_${todoItems[todo].id}">
@@ -399,12 +460,25 @@ $(document).ready(function() {
                     )
                 }
 
+                if(todo_completed.length > todoItems.length){
+                    for(var i = todoItems.length; i < todo_completed.length; i++){
+                        document.getElementById(`todoC_${i}`).remove()
+                    }
+                }
+                todo_completed = todoItems;
+
                 for (var todo in todoItems) {
                     var deleteTodoBtn = document.getElementById(`deleteTodo_${todoItems[todo].id}`)
 
-                    deleteTodoBtn.addEventListener('click', (function(item) {
+                    deleteTodoBtn.addEventListener('click', (function(element) {
                         return function() {
-                            deleteTodo(item)
+                            deleteTodo(element)
+                            $("#valid-completed").addClass("text-danger")
+                            $("#valid-completed").html(`Todo Deleted <em>${element.title}</em>`)
+                            setTimeout(() => {
+                                $("#valid-completed").html("")
+                                $("#valid-completed").removeClass("text-danger")
+                            }, 2000)
                         }
                     })(todoItems[todo]))
 
@@ -415,6 +489,14 @@ $(document).ready(function() {
                         deleteTaskBtn.addEventListener('click', (function(element) {
                             return function() {
                                 deleteTask(element)
+                                $("#valid-completed").addClass("text-danger")
+                                $("#valid-completed").html(
+                                    `Task <em>${element.heading}</em> Deleted`
+                                )
+                                setTimeout(() =>{
+                                    $("#valid-completed").html("")
+                                    $("#valid-completed").removeClass("text-danger")
+                                }, 2000)
                             }
                         })(taskItems[task]))
                     }
@@ -422,28 +504,50 @@ $(document).ready(function() {
 
             },
             error: function(err) {
-                console.log(err)
             }
         })
     }
 
     function editTodoItem(item) {
-        stateSave: true
         var user_id = $('#welcome').data('id');
         var title = $(`#updateTodoInp_${item.id}`).val();
+        console.log(title);
         $.ajax({
-            url: `api/update-todo/${item.id}/`,
-            type: 'POST',
+            url: `api/todo/${item.id}/`,
+            type: 'PATCH',
             data: {
                 'title': title,
                 'user_id': user_id,
-                'csrfmiddlewaretoken': csrftoken,
+            },
+            headers:{
+                "X-CSRFToken": csrftoken
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (title.length === 0) {
+                    $("#validations").addClass("text-danger");
+                    $("#validations").html(
+                        `Input Field cannot be empty! Previous value
+                            <em>${item.title}</em> saved.`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 3000);
+                } else {
+                    $("#validations").removeClass("text-danger");
+                    $("#validations").addClass("text-success");
+                    $("#validations").html(
+                        `Todo updated from <em>${item.title}</em> tod <em>${title}</em>`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 3000);
+                }
             },
             error: function(data) {
-                console.log('Problem in updating todo item: ', data)
             }
         })
     }
@@ -454,17 +558,39 @@ $(document).ready(function() {
         $.ajax({
             url: 'api/create-task/',
             type: 'POST',
+            headers:{
+                'X-CSRFToken':csrftoken
+            },
             data: {
                 'heading': heading,
                 'user': user_id,
                 'todo': item.id,
-                'csrfmiddlewaretoken': csrftoken,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (heading.length === 0) {
+                    $("#validations").addClass("text-danger");
+                    $("#validations").html(
+                        `Input Field cannot be empty!`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 2000);
+                } else {
+                    $("#validations").removeClass("text-danger");
+                    $("#validations").addClass("text-success");
+                    $("#validations").html(
+                        `Created new Task <em>${heading}</em> for <em>${item.title}</em>`
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 2000);
+                }
             },
             error: function(data) {
-                console.log('Problem in adding new task item: ', data)
             }
         })
     }
@@ -472,38 +598,43 @@ $(document).ready(function() {
     function completedTodo(item) {
         var user_id = $('#welcome').data('id')
         $.ajax({
-            url: `api/completeTodoTask/${item.id}/`,
-            type: 'POST',
+            url: `api/completeTodo/${item.id}/`,
+            type: 'PATCH',
+            headers:{
+                "X-CSRFToken":csrftoken
+            },
             data: {
                 'title': item.title,
                 'user_id': user_id,
                 'completed': true,
-                'csrfmiddlewaretoken': csrftoken
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(completedHome);
+                $("#validations").html(`Todo Item <em>${item.title}</em> marked completed`)
+                $("#validations").addClass("text-primary");
+                setTimeout(() => {
+                    $("#validations").html("")
+                    $("#validations").removeClass("text-primary");
+                }, 2000)
             },
             error: function(data) {
-                console.log('Problem in Completing Todo item: ', data)
             }
         })
     }
 
     function deleteTodo(item) {
-        console.log('Delete Todo Button Clicked: ', item.title)
         $.ajax({
-            url: `api/delete-todo/${item.id}/`,
+            url: `api/todo/${item.id}/`,
             type: 'DELETE',
             headers: {
                 "X-CSRFToken": csrftoken,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
-                console.log("There was an error while deleting Todo Item: ", data)
             }
         })
     }
@@ -513,19 +644,45 @@ $(document).ready(function() {
         var user_id = $('#welcome').data('id');
         var heading = $(`#updateTaskInp_${item.id}`).val();
         $.ajax({
-            url: `api/update-task/${item.id}/`,
-            type: 'POST',
+            url: `api/task/${item.id}/`,
+            type: 'PATCH',
+            headers:{
+                "X-CSRFToken":csrftoken
+            },
             data: {
                 'heading': heading,
                 'user': user_id,
                 'todo': item.todo,
-                'csrfmiddlewaretoken': csrftoken,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
+
+                if (heading.length === 0){
+                    $("#validations").html(
+                        `<medium class="text-danger">
+                            Field Cannot be empty! So, previous value saved.
+                        <medium>`
+                    );
+                    $("#validations").addClass("text-danger");
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-danger");
+                    }, 3000)
+                } else {
+                    $("#validations").removeClass("text-danger");
+                    $("#validations").addClass("text-success");
+                    $("#validations").html(
+                        `<medium class="text-success">Updated Task item from
+                            <em>${item.heading}</em> to <em>${heading}</em></medium>
+                        `
+                    );
+                    setTimeout(() => {
+                        $("#validations").html("");
+                        $("#validations").removeClass("text-success");
+                    }, 3000)
+                }
             },
             error: function(err) {
-                console.log("There was an error while deleting Task Item: ", data)
             }
         })
     }
@@ -533,40 +690,39 @@ $(document).ready(function() {
     function completedTask(item) {
         var user_id = $('#welcome').data('id')
         $.ajax({
-            url: `api/complete-task/${item.id}/`,
-            type: 'POST',
+            url: `api/completeTask/${item.id}/`,
+            type: 'PATCH',
+            headers:{
+                "X-CSRFToken":csrftoken
+            },
             data: {
                 'heading': item.heading,
                 'user': user_id,
                 'completed': true,
                 'title': 'title',
                 'user_id': user_id,
-                'csrfmiddlewaretoken': csrftoken,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(completedHome);
             },
             error: function(data) {
-                console.log('Problem in Completing Task item: ', data)
             }
         })
     }
 
     function deleteTask(item) {
-        console.log("Delete Task Button Clicked: ", item.heading)
         $.ajax({
-            url: `api/delete-task/${item.id}/`,
+            url: `api/task/${item.id}/`,
             type: 'DELETE',
             headers: {
                 "X-CSRFToken": csrftoken,
             },
             success: function(data) {
                 todoIncompleteItems(currentPageIncomplete);
-                todoCompletedItems(currentCompleted);
+                todoCompletedItems(currentPageCompleted);
             },
             error: function(data) {
-                console.log("There was an error while deleting Task Item: ", data)
             }
         })
     }

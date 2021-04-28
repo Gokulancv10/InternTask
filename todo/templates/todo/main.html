@@ -1,16 +1,19 @@
 {% extends 'todo/index.html' %}
 {% block content %}
 <div class="center-column" id="center-column">
-    <h5 class="card-title" id="welcome" data-id={{ request.user.id }}>
+    <h5 class="card-title mb-1" id="welcome" data-id="{{ request.user.id }}">
         Hello {{ request.user.username }}, Create your todo list's
     </h5>
     <div id="addTodoForm">
-        <form action="" method="">
+        <form class="needs-validation" id="todoForm" action="" method="" novalidate>
             <div class="input-group-append">
-                <input type="text" id="id_title" required name='title'>
+                <input type="text" class="title-input" required name="title" placeholder="e.g Chemistry">
                 <button type="submit" class="form-control btn btn-primary mr-sm-2" id="addTodobtn">
-                    Submit
+                    Add Todo
                 </button>
+            </div>
+            <div id="form-validators">
+                <small class="text-left font-weight-bold m-0 p-0" id="addTodo-valid"></small>
             </div>
         </form>
     </div>
@@ -22,6 +25,7 @@
                 <h5 class="card-title">
                     Incomplete Todo Items
                 </h5>
+                <small class="font-weight-bold text-danger" id="validations"></small>
                 <hr />
                 <div class="list-group flex-wrap" id="incompleteTodo">
                 </div>
@@ -32,7 +36,7 @@
                             <button class="page-link" tabindex="-1" id="prevPageI">&laquo</button>
                         </li>
                         <li class="page-item"><button class="page-link" id="currPageI">1</button></li>
-                        <li class="page-item"><button class="page-link" id="nextPageI" >&raquo</button></li>
+                        <li class="page-item"><button class="page-link" id="nextPageI">&raquo</button></li>
                     </ul>
                 </nav>
             </div>
@@ -44,6 +48,7 @@
                 <h5 class="card-title">
                     Completed Todo Items
                 </h5>
+                <small class="font-weight-bold" id="valid-completed"></small>
                 <hr>
                 <div class="list-group" id="completedTodo">
                 </div>
@@ -61,5 +66,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
