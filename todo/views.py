@@ -1,20 +1,19 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.utils import timezone
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-
+from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
-from .models import Todo, Task
-from .forms import TodoForm, TaskForm, UserRegisterForm
-from .serializers import TodoSerializer, TaskSerializer, UserSerializer
+from .forms import TaskForm, TodoForm, UserRegisterForm
+from .models import Task, Todo
+from .serializers import TaskSerializer, TodoSerializer, UserSerializer
 
 
 @login_required
